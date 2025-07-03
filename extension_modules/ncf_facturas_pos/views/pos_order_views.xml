@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista básica de POS con NCF -->
+    <record id="view_pos_form_ncf_extension" model="ir.ui.view">
+        <field name="name">pos.order.form.ncf.extension</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="customer_rnc"/>
+                <field name="ncf_type_id"/>
+                <field name="ncf_sequence_id"/>
+                <field name="ncf_number" readonly="1"/>
+            </field>
+        </field>
+    </record>
+</odoo>

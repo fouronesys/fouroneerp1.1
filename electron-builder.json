@@ -1,0 +1,140 @@
+{
+  "appId": "com.fourone.solutions.erp",
+  "productName": "Four One ERP",
+  "copyright": "Copyright © 2025 Four One Solutions",
+  "description": "Sistema integral de gestión empresarial para República Dominicana",
+  "author": "Four One Solutions <info@fourone.com.do>",
+  "homepage": "https://fourone.com.do",
+  "directories": {
+    "output": "dist-electron"
+  },
+  "files": [
+    "electron/**/*",
+    "dist/**/*",
+    "node_modules/**/*",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "electron/assets",
+      "to": "assets"
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64", "ia32"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64", "ia32"]
+      }
+    ],
+    "icon": "electron/assets/icon.ico",
+    "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
+    "publisherName": "Four One Solutions",
+    "verifyUpdateCodeSignature": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "allowElevation": true,
+    "installerIcon": "electron/assets/icon.ico",
+    "uninstallerIcon": "electron/assets/icon.ico",
+    "installerHeader": "electron/assets/installer-header.bmp",
+    "installerHeaderIcon": "electron/assets/icon.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Four One Solutions",
+    "include": "electron/installer.nsh",
+    "script": "electron/installer.nsh"
+  },
+  "portable": {
+    "artifactName": "${productName}-Portable-${version}-${arch}.${ext}"
+  },
+  "mac": {
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "icon": "electron/assets/icon.icns",
+    "category": "public.app-category.business",
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "electron/assets/entitlements.mac.plist",
+    "entitlementsInherit": "electron/assets/entitlements.mac.plist"
+  },
+  "dmg": {
+    "title": "${productName} ${version}",
+    "icon": "electron/assets/volume.icns",
+    "background": "electron/assets/dmg-background.png",
+    "contents": [
+      {
+        "x": 410,
+        "y": 150,
+        "type": "link",
+        "path": "/Applications"
+      },
+      {
+        "x": 130,
+        "y": 150,
+        "type": "file"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    }
+  },
+  "linux": {
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64"]
+      },
+      {
+        "target": "rpm",
+        "arch": ["x64"]
+      },
+      {
+        "target": "tar.gz",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "electron/assets/icon.png",
+    "category": "Office",
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "desktop": {
+      "StartupWMClass": "four-one-solutions",
+      "MimeType": "x-scheme-handler/fourone"
+    }
+  },
+  "appImage": {
+    "artifactName": "${productName}-${version}-${arch}.AppImage"
+  },
+  "deb": {
+    "packageCategory": "office",
+    "priority": "optional",
+    "artifactName": "${productName}-${version}-${arch}.deb"
+  },
+  "rpm": {
+    "packageCategory": "Office/Finance",
+    "artifactName": "${productName}-${version}-${arch}.rpm"
+  },
+  "publish": {
+    "provider": "generic",
+    "url": "https://releases.fourone.solutions/"
+  }
+}

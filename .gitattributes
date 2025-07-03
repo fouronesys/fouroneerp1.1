@@ -1,0 +1,9 @@
+*.psd filter=lfs diff=lfs merge=lfs -text
+archivos filter=lfs diff=lfs merge=lfs -text
+grandes filter=lfs diff=lfs merge=lfs -text
+\# filter=lfs diff=lfs merge=lfs -text
+Configura filter=lfs diff=lfs merge=lfs -text
+LFS filter=lfs diff=lfs merge=lfs -text
+para filter=lfs diff=lfs merge=lfs -text
+*.sql filter=lfs diff=lfs merge=lfs -text
+*.TXT filter=lfs diff=lfs merge=lfs -text

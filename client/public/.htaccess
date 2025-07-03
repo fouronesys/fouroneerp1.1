@@ -1,0 +1,84 @@
+# SEO and Performance Optimization for Four One Solutions
+# Apache Configuration for better search engine ranking
+
+# Enable Gzip Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+</IfModule>
+
+# Browser Caching for Performance
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/pdf "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType application/x-shockwave-flash "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresDefault "access plus 2 days"
+</IfModule>
+
+# Security Headers for SEO Trust
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# URL Rewriting for SEO-friendly URLs
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Force HTTPS for SEO ranking boost
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    
+    # Force www subdomain for consistency
+    RewriteCond %{HTTP_HOST} ^fourone\.com\.do [NC]
+    RewriteRule ^(.*)$ https://www.fourone.com.do/$1 [L,R=301]
+    
+    # Remove trailing slashes
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{THE_REQUEST} \s/+([^?]*?)//+[?\s] [OR]
+    RewriteCond %{THE_REQUEST} \s/+([^?]*?)/+\?[?\s]
+    RewriteRule ^ /%1? [R=301,L]
+    
+    # SEO-friendly URL structure
+    RewriteRule ^sistema-erp-republica-dominicana/?$ / [L,R=301]
+    RewriteRule ^facturacion-ncf-dgii/?$ /billing [L,R=301]
+    RewriteRule ^pos-restaurante-dominicana/?$ /pos [L,R=301]
+    RewriteRule ^inventario-empresarial/?$ /inventory [L,R=301]
+    RewriteRule ^contabilidad-dgii/?$ /accounting [L,R=301]
+    RewriteRule ^reportes-fiscales/?$ /reports [L,R=301]
+</IfModule>
+
+# MIME types for proper file serving
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType text/css .css
+    AddType image/svg+xml .svg
+    AddType application/json .json
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
+# Custom Error Pages for Better UX
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+ErrorDocument 403 /403.html

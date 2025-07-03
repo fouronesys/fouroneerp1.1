@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <!-- Botón NCF en el ProductScreen -->
+    <t t-name="pos_ncf.NCFButton" t-inherit="point_of_sale.ProductScreen" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('switchpane')]" position="after">
+            <div class="ncf-controls" style="padding: 10px; background: #f8f9fa; border-top: 1px solid #dee2e6;">
+                <div class="ncf-info-display" style="margin-bottom: 10px;">
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="badge badge-primary" t-if="pos.get_order() and pos.get_order().ncf_type_code">
+                                NCF: <t t-esc="pos.get_order().ncf_type_code"/>
+                            </span>
+                            <span class="text-muted" t-else="">Sin NCF</span>
+                        </div>
+                        <div class="col-6 text-right">
+                            <span class="badge badge-info" t-if="pos.get_order() and pos.get_order().customer_rnc">
+                                RNC: <t t-esc="pos.get_order().customer_rnc"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ncf-buttons">
+                    <button class="btn btn-primary btn-sm" t-on-click="selectNCFType" style="margin-right: 5px;">
+                        <i class="fa fa-file-text"/> Tipo NCF
+                    </button>
+                    <button class="btn btn-secondary btn-sm" t-on-click="setCustomerRNC">
+                        <i class="fa fa-id-card"/> RNC Cliente
+                    </button>
+                </div>
+            </div>
+        </xpath>
+    </t>
+</templates>

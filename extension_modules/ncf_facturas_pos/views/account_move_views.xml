@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista básica de facturas con NCF -->
+    <record id="view_move_form_ncf_extension" model="ir.ui.view">
+        <field name="name">account.move.form.ncf.extension</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <field name="ref" position="after">
+                <field name="ncf_type_id" invisible="move_type not in ('out_invoice', 'out_refund')"/>
+                <field name="ncf_sequence_id" invisible="move_type not in ('out_invoice', 'out_refund')"/>
+                <field name="ncf_number" invisible="move_type not in ('out_invoice', 'out_refund')" readonly="1"/>
+                <field name="customer_rnc" invisible="move_type not in ('out_invoice', 'out_refund')"/>
+                <field name="itbis_amount" invisible="move_type not in ('out_invoice', 'out_refund')" readonly="1"/>
+            </field>
+        </field>
+    </record>
+</odoo>

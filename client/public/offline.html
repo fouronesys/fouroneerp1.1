@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Four One Solutions - Sin Conexión</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 20px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #e2e8f0;
+        }
+        
+        h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #94a3b8;
+            font-weight: normal;
+        }
+        
+        .status {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 15px;
+            background: rgba(239, 68, 68, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .offline-icon {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #ef4444;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .offline-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 2px;
+            background: #ef4444;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+        
+        .features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        
+        .features li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+            display: flex;
+            align-items: center;
+        }
+        
+        .features li:last-child {
+            border-bottom: none;
+        }
+        
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .check-icon::after {
+            content: '✓';
+            font-size: 12px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .retry-button {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .install-button {
+            background: transparent;
+            border: 2px solid #64748b;
+            color: #64748b;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .install-button:hover {
+            border-color: #94a3b8;
+            color: #94a3b8;
+        }
+        
+        .connection-status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            h2 {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">F1</div>
+        
+        <h1>Sin Conexión a Internet</h1>
+        <h2>Four One Solutions funciona offline</h2>
+        
+        <div class="status">
+            <div class="status-icon">
+                <div class="offline-icon"></div>
+            </div>
+            <p>No se pudo conectar al servidor. Verifica tu conexión a internet e intenta nuevamente.</p>
+        </div>
+        
+        <ul class="features">
+            <li>
+                <div class="check-icon"></div>
+                <span>Los datos guardados localmente están disponibles</span>
+            </li>
+            <li>
+                <div class="check-icon"></div>
+                <span>Puedes continuar trabajando offline</span>
+            </li>
+            <li>
+                <div class="check-icon"></div>
+                <span>Se sincronizará automáticamente al reconectarse</span>
+            </li>
+        </ul>
+        
+        <button class="retry-button" onclick="retryConnection()">
+            Reintentar Conexión
+        </button>
+        
+        <button class="install-button" onclick="goToApp()">
+            Ir a la Aplicación
+        </button>
+        
+        <div class="connection-status">
+            <span id="connection-status">Verificando conexión...</span>
+        </div>
+    </div>
+
+    <script>
+        // Check connection status
+        function updateConnectionStatus() {
+            if (navigator.onLine) {
+                document.getElementById('connection-status').textContent = 'Conexión detectada - Intenta recargar';
+                document.querySelector('.retry-button').style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            } else {
+                document.getElementById('connection-status').textContent = 'Sin conexión a internet';
+                document.querySelector('.retry-button').style.background = 'linear-gradient(135deg, #6b7280, #4b5563)';
+            }
+        }
+        
+        // Retry connection
+        function retryConnection() {
+            if (navigator.onLine) {
+                window.location.href = '/';
+            } else {
+                // Try to reload anyway in case of false negative
+                window.location.reload();
+            }
+        }
+        
+        // Go to app (try to load from cache)
+        function goToApp() {
+            window.location.href = '/';
+        }
+        
+        // Listen for connection changes
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        
+        // Initial status check
+        updateConnectionStatus();
+        
+        // Auto-retry every 30 seconds if online
+        setInterval(() => {
+            if (navigator.onLine) {
+                fetch('/', { method: 'HEAD', mode: 'no-cors' })
+                    .then(() => {
+                        window.location.href = '/';
+                    })
+                    .catch(() => {
+                        // Still offline
+                    });
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
