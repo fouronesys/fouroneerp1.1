@@ -1,0 +1,24 @@
+[build]
+# Instala dependencias y construye la aplicación (si es necesario)
+command = "npm install && npm run build"
+
+[deploy]
+# Inicia la aplicación en modo producción
+startCommand = "npm run start"
+
+[variables]
+# Variables críticas (ajustar según el entorno)
+PORT = "5000"
+NODE_ENV = "production"
+DATABASE_URL = "postgresql://user:pass@host:port/db"  # Reemplazar con tu conexión PostgreSQL
+SESSION_SECRET = "tu-clave-secreta-32-caracteres"     # Usar un secreto fuerte
+BCRYPT_ROUNDS = "12"                                  # Para hashing de contraseñas
+
+# Variables opcionales (según necesidades)
+ANTHROPIC_API_KEY = ""                                # IA (opcional)
+PAYPAL_CLIENT_ID = ""                                 # Pagos (opcional)
+SENDGRID_API_KEY = ""                                 # Email (opcional)
+
+[plugins]
+# Asegura que PostgreSQL esté disponible
+postgresql = { version = "14" }
