@@ -1,9 +1,7 @@
 node_modules
 dist
 .DS_Store
-vite.config.ts
 server/public
 /downloads/backups/
 /attached_assets/
-vite.config.ts.*
 *.tar.gz
