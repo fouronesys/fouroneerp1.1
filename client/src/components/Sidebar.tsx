@@ -142,14 +142,14 @@ const navigation = [
     color: "from-rose-500 to-rose-600",
     feature: "reports"
   },
-  {
+  /*{
     name: "Asistente IA",
     href: "/ai-assistant",
     icon: Brain,
     color: "from-violet-500 to-violet-600",
     feature: "ai",
     badge: "IA"
-  },
+  },*/
   {
     name: "Chat Interno",
     href: "/chat",
