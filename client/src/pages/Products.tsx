@@ -175,30 +175,27 @@ export default function Products() {
     },
   });
 
-  const generateImageMutation = useMutation({
-    mutationFn: async (data: { productName: string; productCode?: string; description?: string; source?: string }) => {
-      return await apiRequest("/api/products/generate-image", {
-        method: "POST",
-        body: data
-      });
-    },
-    onSuccess: (data: any) => {
-      // Update both form and state to ensure immediate visual update
-      form.setValue("imageUrl", data.imageUrl, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+ const generateImageMutation = useMutation({
+  mutationFn: async (data: { productName: string; productCode?: string; description?: string; source?: string; productId?: string }) => {
+    return await apiRequest("/api/products/generate-image", {
+      method: "POST",
+      body: data
+    });
+  },
+  onSuccess: (data, variables) => {
+    // Actualiza la imagen en el formulario si corresponde
+    if (form.getValues("name") === variables.productName) {
+      form.setValue("imageUrl", data.imageUrl);
       setCurrentImageUrl(data.imageUrl);
-      toast({
-        title: "Imagen generada",
-        description: "Nueva imagen generada automáticamente.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "No se pudo generar la imagen automáticamente.",
-        variant: "destructive",
-      });
-    },
-  });
+    }
+    // Invalida y actualiza la lista
+    queryClient.invalidateQueries({ queryKey: ["/api/products"], exact: true });
+    toast({ title: "Imagen generada", description: "Se ha generado la imagen automáticamente." });
+  },
+  onError: () => {
+    toast({ title: "Error", description: "No se pudo generar la imagen.", variant: "destructive" });
+  }
+});
 
   // Batch image generation function
   const generateBatchImages = async () => {
@@ -649,78 +646,67 @@ export default function Products() {
                       )}
                     />
                     
-                    {/* Image Generation Buttons */}
+                    {/* Image Generation Buttons - Cambios aplicados */}
                     <div className="grid grid-cols-2 gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          const productName = form.getValues("name");
-                          const productCode = form.getValues("code");
-                          const description = form.getValues("description");
-                          
-                          if (productName) {
-                            generateImageMutation.mutate({
-                              productName,
-                              productCode: productCode || undefined,
-                              description: description || undefined
-                            });
-                          } else {
-                            toast({
-                              title: "Error",
-                              description: "Ingrese el nombre del producto primero.",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                        disabled={generateImageMutation.isPending}
-                        className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
-                      >
-                        {generateImageMutation.isPending ? (
-                          <div className="flex items-center gap-2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                            Generando con IA...
-                          </div>
-                        ) : (
-                          "Generar con Gemini AI"
-                        )}
-                      </Button>
+<Button
+  type="button"
+  variant="outline"
+  onClick={() => {
+    const productName = form.getValues("name");
+    const productCode = form.getValues("code");
+    const description = form.getValues("description");
+    if (productName) {
+      generateImageMutation.mutate({
+        productName,
+        productCode: productCode || undefined,
+        description: description || undefined,
+        source: "manual"
+      });
+    } else {
+      toast({ title: "Error", description: "Ingrese el nombre del producto primero.", variant: "destructive" });
+    }
+  }}
+  disabled={generateImageMutation.isLoading}
+>
+  {generateImageMutation.isLoading ? (
+    <div className="flex items-center gap-2">
+      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+      Generando con IA...
+    </div>
+  ) : (
+    "Generar con Gemini AI"
+  )}
+</Button>
                       
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          const productName = form.getValues("name");
-                          const productCode = form.getValues("code");
-                          const description = form.getValues("description");
-                          
-                          if (productName) {
-                            generateImageMutation.mutate({
-                              productName,
-                              productCode: productCode || undefined,
-                              description: description || undefined,
-                              source: 'unsplash'
-                            });
-                          } else {
-                            toast({
-                              title: "Error",
-                              description: "Ingrese el nombre del producto primero.",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                        disabled={generateImageMutation.isPending}
-                        className="w-full"
-                      >
-                        {generateImageMutation.isPending ? (
-                          <div className="flex items-center gap-2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                            Buscando...
-                          </div>
-                        ) : (
-                          "Buscar en Unsplash"
-                        )}
-                      </Button>
+                   <Button
+  type="button"
+  variant="outline"
+  onClick={() => {
+    const productName = form.getValues("name");
+    const productCode = form.getValues("code");
+    const description = form.getValues("description");
+    if (productName) {
+      generateImageMutation.mutate({
+        productName,
+        productCode: productCode || undefined,
+        description: description || undefined,
+        source: "unsplash"
+      });
+    } else {
+      toast({ title: "Error", description: "Ingrese el nombre del producto primero.", variant: "destructive" });
+    }
+  }}
+  disabled={generateImageMutation.isLoading}
+>
+  {generateImageMutation.isLoading ? (
+    <div className="flex items-center gap-2">
+      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+      Buscando...
+    </div>
+  ) : (
+    "Buscar en Unsplash"
+  )}
+</Button>
                     </div>
                   </div>
 
@@ -959,32 +945,22 @@ export default function Products() {
                             </div>
                             <div className="flex items-center space-x-2 ml-2">
                               {!product.imageUrl && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={async () => {
-                                    try {
-                                      const result = await apiRequest(`/api/products/${product.id}/generate-image`, {
-                                        method: "POST"
-                                      });
-                                      toast({
-                                        title: "Imagen generada",
-                                        description: "La imagen ha sido generada con IA exitosamente.",
-                                      });
-                                      queryClient.invalidateQueries({ queryKey: ["/api/products"], exact: true });
-                                    } catch (error) {
-                                      toast({
-                                        title: "Error",
-                                        description: "No se pudo generar la imagen.",
-                                        variant: "destructive",
-                                      });
-                                    }
-                                  }}
-                                  className="h-8 w-8 p-0 text-purple-600 hover:text-purple-700"
-                                  title="Generar imagen con IA"
-                                >
-                                  <Sparkles className="h-4 w-4" />
-                                </Button>
+                                <Button
+  variant="ghost"
+  size="sm"
+  onClick={() => {
+    generateImageMutation.mutate({
+      productName: product.name,
+      productCode: product.code,
+      description: product.description || "",
+      source: "single",
+      productId: product.id
+    });
+  }}
+  className="text-purple-600 hover:text-purple-700"
+>
+  <Sparkles className="h-4 w-4" />
+</Button>
                               )}
                               <Button 
                                 variant="ghost" 
