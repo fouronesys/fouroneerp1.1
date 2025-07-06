@@ -394,6 +394,7 @@ private async updateDatabase(): Promise<boolean> {
                             storage.bulkCreateRNCRegistry(records),
                             new Promise((_, reject) => 
                                 setTimeout(() => reject(new Error('Operation timeout')), 15000)
+                            )
                         ]);
 
                         return result;
