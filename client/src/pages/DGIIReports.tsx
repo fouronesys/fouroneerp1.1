@@ -84,15 +84,11 @@ export default function DGIIReports() {
     onSuccess: (newReport: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/dgii/reports"] });
       setGeneratingReport(false);
-      toast({
-        title: "Éxito",
-        description: "Reporte generado correctamente. Descargando archivo...",
-      });
       
-      // Auto-download the generated report
-      setTimeout(() => {
-        downloadReportMutation.mutate(newReport.id);
-      }, 500);
+      toast({
+        title: "Reporte generado exitosamente",
+        description: "El reporte ha sido creado. Puede descargarlo desde la tabla de historial de reportes.",
+      });
     },
     onError: (error: any) => {
       setGeneratingReport(false);
@@ -515,6 +511,16 @@ export default function DGIIReports() {
                   <p>• Fecha límite: Día 5 del mes siguiente</p>
                   <p>• Formato: Cédula|Nombre|Salario|SFS|AFP|ISR|OtrasRetenciones|Período|</p>
                   <p>• Importante para el cálculo correcto de deducciones</p>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4 bg-blue-50 dark:bg-blue-950/20">
+                <h3 className="font-medium mb-2 text-blue-800 dark:text-blue-200">📋 Proceso de Generación de Reportes</h3>
+                <div className="text-sm text-blue-700 dark:text-blue-300 space-y-2">
+                  <p><strong>1. Generar Reporte:</strong> Seleccione el tipo de reporte, año y mes, luego haga clic en "Generar Reporte"</p>
+                  <p><strong>2. Verificar en Historial:</strong> Una vez generado, el reporte aparecerá en la tabla de "Historial de Reportes"</p>
+                  <p><strong>3. Descargar:</strong> Use el botón de descarga (icono ⬇️) junto al reporte en la tabla de historial</p>
+                  <p><strong>4. Enviar a DGII:</strong> Después de descargar, use el botón de envío (icono ⬆️) para marcarlo como enviado</p>
                 </div>
               </div>
 
