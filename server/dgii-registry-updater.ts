@@ -97,11 +97,37 @@ export class DGIIRegistryUpdater {
       // Create backup of current registry
       await this.createBackup();
 
-      // Download latest ZIP file
-      const downloadSuccess = await this.downloadRNCFile();
-      if (!downloadSuccess) {
-        throw new Error('Failed to download RNC file');
-      }
+     // Download latest ZIP file with improved error handling and memory management
+const downloadSuccess = await this.downloadRNCFile();
+if (!downloadSuccess) {
+    // Enhanced error information
+    const errorDetails = {
+        timestamp: new Date().toISOString(),
+        errorType: 'DOWNLOAD_FAILED',
+        downloadUrl: this.config.downloadUrl,
+        downloadPath: this.config.downloadPath,
+        retryCount: this.config.maxRetries
+    };
+
+    // Log detailed error information
+    console.error('RNC file download failed:', {
+        ...errorDetails,
+        storage: await this.checkStorageAvailability(),
+        network: await this.checkNetworkConnectivity()
+    });
+
+    // Clean up failed download if it exists
+    try {
+        if (fs.existsSync(this.config.downloadPath)) {
+            fs.unlinkSync(this.config.downloadPath);
+            console.log('Cleaned up failed download file');
+        }
+    } catch (cleanupError) {
+        console.error('Failed to clean up download file:', cleanupError);
+    }
+
+    throw new Error(`Failed to download RNC file after ${this.config.maxRetries} attempts. See logs for details`);
+}
 
       // Extract and process the ZIP file
       const extractSuccess = await this.extractAndProcessZip();
@@ -160,77 +186,109 @@ export class DGIIRegistryUpdater {
 
     return success;
   }
-
-  /**
-   * Download the RNC ZIP file from DGII
-   */
-  private async downloadRNCFile(): Promise<boolean> {
+/**
+ * Download the RNC ZIP file from DGII (optimized version)
+ */
+private async downloadRNCFile(): Promise<boolean> {
     return new Promise((resolve) => {
-      let retries = 0;
+        let retries = 0;
+        let downloadStartTime: number;
+        let downloadedBytes = 0;
+        let speedMonitorInterval: NodeJS.Timeout;
 
-      const attemptDownload = () => {
-        const file = createWriteStream(this.config.downloadPath);
-        
-        const request = https.get(this.config.downloadUrl, (response) => {
-          if (response.statusCode !== 200) {
-            console.error(`Download failed with status: ${response.statusCode}`);
-            file.close();
-            if (retries < this.config.maxRetries) {
-              retries++;
-              console.log(`Retrying download (attempt ${retries}/${this.config.maxRetries})...`);
-              setTimeout(attemptDownload, 5000 * retries); // Progressive delay
-            } else {
-              resolve(false);
-            }
-            return;
-          }
+        const cleanup = () => {
+            if (speedMonitorInterval) clearInterval(speedMonitorInterval);
+        };
 
-          pipeline(response, file)
-            .then(() => {
-              console.log('DGII RNC file downloaded successfully');
-              resolve(true);
-            })
-            .catch((error) => {
-              console.error('Download pipeline error:', error);
-              if (retries < this.config.maxRetries) {
-                retries++;
-                console.log(`Retrying download (attempt ${retries}/${this.config.maxRetries})...`);
-                setTimeout(attemptDownload, 5000 * retries);
-              } else {
-                resolve(false);
-              }
+        const attemptDownload = () => {
+            cleanup();
+            downloadStartTime = Date.now();
+            downloadedBytes = 0;
+
+            // Create temp file during download
+            const tempDownloadPath = `${this.config.downloadPath}.tmp`;
+            const file = createWriteStream(tempDownloadPath);
+            
+            // Speed monitoring
+            speedMonitorInterval = setInterval(() => {
+                const elapsed = (Date.now() - downloadStartTime) / 1000;
+                const speed = (downloadedBytes / 1024 / 1024 / elapsed).toFixed(2);
+                console.log(`Download speed: ${speed} MB/s`);
+            }, 5000);
+
+            const request = https.get(this.config.downloadUrl, (response) => {
+                // Track download progress
+                response.on('data', (chunk) => {
+                    downloadedBytes += chunk.length;
+                });
+
+                if (response.statusCode !== 200) {
+                    console.error(`Download failed with status: ${response.statusCode}`);
+                    file.close();
+                    fs.unlink(tempDownloadPath, () => {});
+                    handleRetryOrFail();
+                    return;
+                }
+
+                pipeline(response, file)
+                    .then(async () => {
+                        // Verify downloaded file size
+                        const stats = fs.statSync(tempDownloadPath);
+                        console.log(`Download complete. Size: ${(stats.size / (1024*1024)).toFixed(2)} MB`);
+
+                        // Validate minimum file size (1MB)
+                        if (stats.size < 1024 * 1024) {
+                            console.error('Downloaded file too small, likely incomplete');
+                            fs.unlink(tempDownloadPath, () => {});
+                            handleRetryOrFail();
+                            return;
+                        }
+
+                        // Rename temp file to final name
+                        fs.renameSync(tempDownloadPath, this.config.downloadPath);
+                        console.log('DGII RNC file downloaded and verified successfully');
+                        cleanup();
+                        resolve(true);
+                    })
+                    .catch((error) => {
+                        console.error('Download pipeline error:', error);
+                        file.close();
+                        fs.unlink(tempDownloadPath, () => {});
+                        handleRetryOrFail();
+                    });
             });
-        });
 
-        request.on('error', (error) => {
-          console.error('Download request error:', error);
-          file.close();
-          if (retries < this.config.maxRetries) {
-            retries++;
-            console.log(`Retrying download (attempt ${retries}/${this.config.maxRetries})...`);
-            setTimeout(attemptDownload, 5000 * retries);
-          } else {
-            resolve(false);
-          }
-        });
+            request.on('error', (error) => {
+                console.error('Download request error:', error);
+                file.close();
+                fs.unlink(tempDownloadPath, () => {});
+                handleRetryOrFail();
+            });
 
-        request.setTimeout(30000, () => {
-          console.error('Download timeout');
-          request.destroy();
-          file.close();
-          if (retries < this.config.maxRetries) {
-            retries++;
-            console.log(`Retrying download (attempt ${retries}/${this.config.maxRetries})...`);
-            setTimeout(attemptDownload, 5000 * retries);
-          } else {
-            resolve(false);
-          }
-        });
-      };
+            request.setTimeout(60000, () => {
+                console.error('Download timeout');
+                request.destroy();
+                file.close();
+                fs.unlink(tempDownloadPath, () => {});
+                handleRetryOrFail();
+            });
 
-      attemptDownload();
+            const handleRetryOrFail = () => {
+                cleanup();
+                if (retries < this.config.maxRetries) {
+                    retries++;
+                    const delay = 5000 * retries;
+                    console.log(`Retrying download (attempt ${retries}/${this.config.maxRetries}) in ${delay/1000}s...`);
+                    setTimeout(attemptDownload, delay);
+                } else {
+                    resolve(false);
+                }
+            };
+        };
+
+        attemptDownload();
     });
-  }
+}
 
 /**
  * Extract and process the ZIP file (memory-optimized version)
@@ -291,66 +349,105 @@ private async extractAndProcessZip(): Promise<boolean> {
     return success;
 }
 
-  /**
-   * Update the database with new RNC data
-   */
-  private async updateDatabase(): Promise<boolean> {
-    try {
-      const rncFilePath = './attached_assets/DGII_RNC.TXT';
-      
-      if (!fs.existsSync(rncFilePath)) {
-        throw new Error('DGII_RNC.TXT file not found');
-      }
+/**
+ * Update the database with new RNC data (stream optimized version)
+ */
+private async updateDatabase(): Promise<boolean> {
+    const rncFilePath = './attached_assets/DGII_TXT.TXT';
+    
+    return new Promise((resolve) => {
+        try {
+            if (!fs.existsSync(rncFilePath)) {
+                throw new Error('DGII_RNC.TXT file not found');
+            }
 
-      // Read and process the RNC file
-      const fileContent = fs.readFileSync(rncFilePath, 'utf-8');
-      const lines = fileContent.split('\n').filter(line => line.trim());
+            // Clear existing registry data first
+            await this.clearExistingRegistry();
 
-      // Clear existing registry data
-      await this.clearExistingRegistry();
-
-      // Process lines in batches to avoid memory issues
-      const batchSize = 1000;
-      let processed = 0;
-      let totalInserted = 0;
-
-      for (let i = 0; i < lines.length; i += batchSize) {
-        const batch = lines.slice(i, i + batchSize);
-        const records = [];
-
-        for (const line of batch) {
-          const parts = line.split('|');
-          if (parts.length >= 3) {
-            records.push({
-              rnc: parts[0]?.trim(),
-              razonSocial: parts[1]?.trim(),
-              nombreComercial: parts[2]?.trim(),
-              categoria: parts[3]?.trim() || 'CONTRIBUYENTE REGISTRADO',
-              regimen: parts[4]?.trim() || 'ORDINARIO',
-              estado: parts[5]?.trim() || 'ACTIVO'
+            const readStream = fs.createReadStream(rncFilePath, { 
+                encoding: 'utf-8',
+                highWaterMark: 64 * 1024 // 64KB chunks
             });
-          }
-        }
 
-        if (records.length > 0) {
-          const result = await storage.bulkCreateRNCRegistry(records);
-          totalInserted += result.inserted;
-          processed += records.length;
-        }
+            let buffer = '';
+            let batch = [];
+            const batchSize = 1000;
+            let totalProcessed = 0;
+            let totalInserted = 0;
+            let lastProgressLog = Date.now();
 
-        // Log progress every 10 batches
-        if ((i / batchSize) % 10 === 0) {
-          console.log(`Processed ${processed}/${lines.length} RNC records...`);
-        }
-      }
+            readStream.on('data', async (chunk) => {
+                buffer += chunk;
+                const lines = buffer.split('\n');
+                
+                // Keep the incomplete line in buffer
+                buffer = lines.pop() || '';
 
-      console.log(`Database update completed: ${totalInserted} RNC records inserted`);
-      return true;
-    } catch (error) {
-      console.error('Error updating database:', error);
-      return false;
-    }
-  }
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+
+                    const parts = line.split('|');
+                    if (parts.length >= 3) {
+                        batch.push({
+                            rnc: parts[0]?.trim(),
+                            razonSocial: parts[1]?.trim(),
+                            nombreComercial: parts[2]?.trim(),
+                            categoria: parts[3]?.trim() || 'CONTRIBUYENTE REGISTRADO',
+                            regimen: parts[4]?.trim() || 'ORDINARIO',
+                            estado: parts[5]?.trim() || 'ACTIVO'
+                        });
+
+                        if (batch.length >= batchSize) {
+                            // Process batch without blocking the stream
+                            const currentBatch = batch;
+                            batch = [];
+                            
+                            try {
+                                const result = await storage.bulkCreateRNCRegistry(currentBatch);
+                                totalInserted += result.inserted;
+                                totalProcessed += currentBatch.length;
+                                
+                                // Log progress every 5 seconds
+                                if (Date.now() - lastProgressLog > 5000) {
+                                    console.log(`Processed ${totalProcessed} RNC records...`);
+                                    lastProgressLog = Date.now();
+                                }
+                            } catch (batchError) {
+                                console.error('Error processing batch:', batchError);
+                            }
+                        }
+                    }
+                }
+            });
+
+            readStream.on('end', async () => {
+                try {
+                    // Process remaining records in buffer
+                    if (batch.length > 0) {
+                        const result = await storage.bulkCreateRNCRegistry(batch);
+                        totalInserted += result.inserted;
+                        totalProcessed += batch.length;
+                    }
+
+                    console.log(`Database update completed: ${totalInserted} RNC records inserted`);
+                    resolve(true);
+                } catch (finalError) {
+                    console.error('Final batch processing error:', finalError);
+                    resolve(false);
+                }
+            });
+
+            readStream.on('error', (error) => {
+                console.error('File read error:', error);
+                resolve(false);
+            });
+
+        } catch (error) {
+            console.error('Database update initialization error:', error);
+            resolve(false);
+        }
+    });
+}
 
   /**
    * Clear existing registry data
