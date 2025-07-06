@@ -100,6 +100,12 @@ export default function Reports() {
     }
 
     // Use real sales data from API
+    const formatRD$ = (value: number): string => {
+  return value.toLocaleString('es-DO', {
+    style: 'currency',
+    currency: 'DOP',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
     const salesChartData = (salesData as any)?.chartData || [];
     const salesByCategory = (salesData as any)?.categoryData || [];
     const totalSales = parseFloat((salesData as any)?.totalSales || "0");
@@ -108,122 +114,134 @@ export default function Reports() {
     const totalItems = (salesData as any)?.totalItems || 0;
     const topProducts = (salesData as any)?.topProducts || [];
 
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Ventas Totales</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">RD${totalSales.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">Período seleccionado</p>
-            </CardContent>
-          </Card>
+  return (
+  <div className="space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Ventas Totales */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Ventas Totales</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{formatRD$(totalSales)}</div>
+          <p className="text-xs text-muted-foreground">Período seleccionado</p>
+        </CardContent>
+      </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Transacciones</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{salesCount}</div>
-              <p className="text-xs text-muted-foreground">Ventas realizadas</p>
-            </CardContent>
-          </Card>
+      {/* Transacciones */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Transacciones</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{salesCount}</div>
+          <p className="text-xs text-muted-foreground">Ventas realizadas</p>
+        </CardContent>
+      </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Ticket Promedio</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">RD${avgTicket.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">Por transacción</p>
-            </CardContent>
-          </Card>
+      {/* Ticket Promedio */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Ticket Promedio</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{formatRD$avgTicket}</div>
+          <p className="text-xs text-muted-foreground">Por transacción</p>
+        </CardContent>
+      </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Productos Vendidos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{salesData?.totalItems || 0}</div>
-              <p className="text-xs text-muted-foreground">Unidades vendidas</p>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Productos Vendidos */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Productos Vendidos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{salesData?.totalItems || 0}</div>
+          <p className="text-xs text-muted-foreground">Unidades vendidas</p>
+        </CardContent>
+      </Card>
+    </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Tendencia de Ventas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={salesChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="ventas" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+    {/* Tendencia de Ventas */}
+    <Card>
+      <CardHeader>
+        <CardTitle>Tendencia de Ventas</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={salesChartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="ventas" stroke="#8884d8" />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  </div>
+);
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Ventas por Categoría</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={salesByCategory}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {salesByCategory.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+  {/* Ventas por Categoría */}
+  <Card>
+    <CardHeader>
+      <CardTitle>Ventas por Categoría</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie
+            data={salesByCategory}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            outerRadius={80}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {salesByCategory.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+        </PieChart>
+      </ResponsiveContainer>
+    </CardContent>
+  </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Productos Más Vendidos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {(salesData?.topProducts || []).length > 0 ? (
-                  salesData.topProducts.map((product: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">{product.quantity} unidades</p>
-                      </div>
-                      <span className="font-mono font-medium">RD${product.revenue.toLocaleString()}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-4 text-muted-foreground">
-                    <Package className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                    <p className="text-sm">No hay datos de productos para este período</p>
-                  </div>
-                )}
+  {/* Productos Más Vendidos */}
+  <Card>
+    <CardHeader>
+      <CardTitle>Productos Más Vendidos</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="space-y-4">
+        {(salesData?.topProducts || []).length > 0 ? (
+          salesData.topProducts.map((product: any, index: number) => (
+            <div key={index} className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{product.name}</p>
+                <p className="text-sm text-muted-foreground">{product.quantity} unidades</p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              {/* Formatear revenue en RD$ */}
+              <span className="font-mono font-medium">
+                RD${parseFloat(product.revenue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
+              </span>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-4 text-muted-foreground">
+            <Package className="h-8 w-8 mx-auto mb-2 opacity-20" />
+            <p className="text-sm">No hay datos de productos para este período</p>
+          </div>
+        )}
+      </div>
+    </CardContent>
+  </Card>
+</div>
       </div>
     );
   };
