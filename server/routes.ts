@@ -4695,15 +4695,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyId: company.id,
           tipo: '606',
           periodo,
-          fechaInicio,
-          fechaFin,
+          fechaInicio: new Date(fechaInicio),
+          fechaFin: new Date(fechaFin),
           numeroRegistros: summary.totalRecords,
           montoTotal: summary.totalAmount.toFixed(2),
           itbisTotal: summary.totalItbis.toFixed(2),
           estado: 'generated',
           generatedAt: new Date(),
           checksum: `CHK${Date.now()}`,
-          fileName: `606_${company.rnc}_${periodo}.txt`
+          fileName: `606_${company.rnc}_${periodo}.txt`,
+          filePath: ''
         };
       } else if (tipo === '607') {
         // Sales report - get all POS sales for the period
@@ -4715,15 +4716,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyId: company.id,
           tipo: '607',
           periodo,
-          fechaInicio,
-          fechaFin,
+          fechaInicio: new Date(fechaInicio),
+          fechaFin: new Date(fechaFin),
           numeroRegistros: summary.totalRecords,
           montoTotal: summary.totalAmount.toFixed(2),
           itbisTotal: summary.totalItbis.toFixed(2),
           estado: 'generated',
           generatedAt: new Date(),
           checksum: `CHK${Date.now()}`,
-          fileName: `607_${company.rnc}_${periodo}.txt`
+          fileName: `607_${company.rnc}_${periodo}.txt`,
+          filePath: ''
         };
       } else if (tipo === 'T-REGISTRO') {
         // Payroll report - placeholder for now
@@ -4733,15 +4735,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyId: company.id,
           tipo: 'T-REGISTRO',
           periodo,
-          fechaInicio,
-          fechaFin,
+          fechaInicio: new Date(fechaInicio),
+          fechaFin: new Date(fechaFin),
           numeroRegistros: 0,
           montoTotal: '0.00',
           itbisTotal: '0.00',
           estado: 'generated',
           generatedAt: new Date(),
           checksum: `CHK${Date.now()}`,
-          fileName: `T-REGISTRO_${company.rnc}_${periodo}.txt`
+          fileName: `T-REGISTRO_${company.rnc}_${periodo}.txt`,
+          filePath: ''
         };
       } else {
         return res.status(400).json({ message: "Invalid report type" });
@@ -4756,8 +4759,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const filePath = path.join(uploadsDir, reportData.fileName!);
       fs.writeFileSync(filePath, reportContent, 'utf8');
 
+      // Add filePath to reportData
+      reportData.filePath = filePath;
+
       // Save the report
       const savedReport = await storage.createDGIIReport(reportData);
+      console.log("Saved report:", savedReport); // Debug log
       res.json(savedReport);
 
     } catch (error) {
