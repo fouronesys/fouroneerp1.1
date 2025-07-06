@@ -233,38 +233,61 @@ export class DGIIRegistryUpdater {
   }
 
   /**
-   * Extract and process the ZIP file
-   */
-  private async extractAndProcessZip(): Promise<boolean> {
+ * Extract and process the ZIP file
+ */
+private async extractAndProcessZip(): Promise<boolean> {
     try {
-      const zip = new AdmZip(this.config.downloadPath);
-      
-      // Extract all files
-      zip.extractAllTo(this.config.extractPath, true);
-      
-      // Find the TXT file (usually DGII_RNC.TXT or similar)
-      const extractedFiles = fs.readdirSync(this.config.extractPath);
-      const txtFile = extractedFiles.find(file => 
-        file.toLowerCase().includes('rnc') && file.toLowerCase().endsWith('.txt')
-      );
+        const zip = new AdmZip(this.config.downloadPath);
+        
+        // Log all files in the ZIP for debugging
+        const zipEntries = zip.getEntries();
+        console.log('Files in ZIP:', zipEntries.map(entry => entry.entryName).join(', '));
+        
+        // Find the TXT file (more flexible search)
+        const txtFile = zipEntries.find(entry => {
+            const lowerName = entry.entryName.toLowerCase();
+            return (lowerName.includes('rnc') || lowerName.includes('dgii')) && 
+                   lowerName.endsWith('.txt');
+        });
 
-      if (!txtFile) {
-        throw new Error('No RNC TXT file found in the ZIP archive');
-      }
+        if (!txtFile) {
+            const availableFiles = zipEntries.map(entry => entry.entryName).join(', ');
+            throw new Error(`No suitable TXT file found in ZIP. Available files: ${availableFiles}`);
+        }
 
-      // Copy the TXT file to replace the current one
-      const sourcePath = path.join(this.config.extractPath, txtFile);
-      const targetPath = './attached_assets/DGII_RNC.TXT';
-      
-      fs.copyFileSync(sourcePath, targetPath);
-      console.log(`RNC file updated: ${txtFile} -> DGII_RNC.TXT`);
+        // Ensure extract path exists
+        if (!fs.existsSync(this.config.extractPath)) {
+            fs.mkdirSync(this.config.extractPath, { recursive: true });
+        }
 
-      return true;
+        // Extract only the TXT file we found
+        zip.extractEntryTo(txtFile, this.config.extractPath, false, true);
+        
+        // Get the extracted file path
+        const extractedFilePath = path.join(this.config.extractPath, path.basename(txtFile.entryName));
+        
+        // Verify the file was extracted
+        if (!fs.existsSync(extractedFilePath)) {
+            throw new Error(`Failed to extract file: ${txtFile.entryName}`);
+        }
+
+        // Ensure target directory exists
+        const targetDir = './attached_assets';
+        if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+        }
+
+        // Copy to final destination
+        const targetPath = path.join(targetDir, 'DGII_RNC.TXT');
+        fs.copyFileSync(extractedFilePath, targetPath);
+        console.log(`RNC file updated: ${txtFile.entryName} -> DGII_RNC.TXT`);
+
+        return true;
     } catch (error) {
-      console.error('Error extracting ZIP file:', error);
-      return false;
+        console.error('Error extracting ZIP file:', error);
+        return false;
     }
-  }
+}
 
   /**
    * Update the database with new RNC data
