@@ -350,89 +350,150 @@ private async extractAndProcessZip(): Promise<boolean> {
 }
 
 /**
- * Update the database with new RNC data (stream optimized version)
+ * Update the database with new RNC data (Neon-optimized version)
  */
 private async updateDatabase(): Promise<boolean> {
     const rncFilePath = './attached_assets/DGII_RNC.TXT';
-    
-    return new Promise(async (resolve) => {  // Added async here
-        try {
-            if (!fs.existsSync(rncFilePath)) {
-                throw new Error('DGII_RNC.TXT file not found');
-            }
+    const MAX_RETRIES = 3;
+    const BATCH_SIZE = 250; // Reduced batch size for Neon constraints
+    const ROW_SIZE_ESTIMATE = 500; // Estimated bytes per row
 
-            // Clear existing registry data first
-            await this.clearExistingRegistry();
+    try {
+        if (!fs.existsSync(rncFilePath)) {
+            throw new Error('DGII_RNC.TXT file not found');
+        }
 
-            const readStream = fs.createReadStream(rncFilePath, { 
-                encoding: 'utf-8',
-                highWaterMark: 64 * 1024 // 64KB chunks
-            });
+        // Clear existing data in smaller chunks
+        await this.clearExistingRegistryInChunks();
 
+        const readStream = fs.createReadStream(rncFilePath, {
+            encoding: 'utf-8',
+            highWaterMark: 32 * 1024 // Smaller chunks (32KB)
+        });
+
+        return new Promise((resolve) => {
             let buffer = '';
             let batch = [];
-            const batchSize = 1000;
             let totalProcessed = 0;
             let totalInserted = 0;
             let lastProgressLog = Date.now();
+            let currentRetries = 0;
+
+            const processBatchWithRetry = async (records: any[]) => {
+                let attempts = 0;
+                while (attempts <= MAX_RETRIES) {
+                    try {
+                        // Estimate memory usage
+                        const estimatedSize = records.length * ROW_SIZE_ESTIMATE;
+                        if (estimatedSize > 5 * 1024 * 1024) { // 5MB
+                            throw new Error('Batch too large for Neon constraints');
+                        }
+
+                        // Insert with shorter timeout
+                        const result = await Promise.race([
+                            storage.bulkCreateRNCRegistry(records),
+                            new Promise((_, reject) => 
+                                setTimeout(() => reject(new Error('Operation timeout')), 15000)
+                        ]);
+
+                        return result;
+                    } catch (error) {
+                        attempts++;
+                        if (attempts > MAX_RETRIES) throw error;
+                        
+                        console.warn(`Batch insert attempt ${attempts} failed, retrying...`, error);
+                        await new Promise(res => setTimeout(res, 2000 * attempts));
+                    }
+                }
+            };
+
+            const processIndividualRecords = async (records: any[]) => {
+                let successCount = 0;
+                for (const record of records) {
+                    let attempts = 0;
+                    while (attempts <= MAX_RETRIES) {
+                        try {
+                            await storage.createRNCRecord(record); // Implement individual insert
+                            successCount++;
+                            break;
+                        } catch (error) {
+                            attempts++;
+                            if (attempts > MAX_RETRIES) {
+                                console.error('Failed to insert record:', record.rnc, error);
+                                break;
+                            }
+                            await new Promise(res => setTimeout(res, 1000 * attempts));
+                        }
+                    }
+                }
+                return successCount;
+            };
 
             readStream.on('data', async (chunk) => {
-                buffer += chunk;
-                const lines = buffer.split('\n');
-                
-                // Keep the incomplete line in buffer
-                buffer = lines.pop() || '';
+                try {
+                    buffer += chunk;
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
 
-                for (const line of lines) {
-                    if (!line.trim()) continue;
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
 
-                    const parts = line.split('|');
-                    if (parts.length >= 3) {
-                        batch.push({
-                            rnc: parts[0]?.trim(),
-                            razonSocial: parts[1]?.trim(),
-                            nombreComercial: parts[2]?.trim(),
-                            categoria: parts[3]?.trim() || 'CONTRIBUYENTE REGISTRADO',
-                            regimen: parts[4]?.trim() || 'ORDINARIO',
-                            estado: parts[5]?.trim() || 'ACTIVO'
-                        });
+                        const parts = line.split('|');
+                        if (parts.length >= 3) {
+                            batch.push({
+                                rnc: parts[0]?.trim(),
+                                razonSocial: parts[1]?.trim(),
+                                nombreComercial: parts[2]?.trim(),
+                                categoria: parts[3]?.trim() || 'CONTRIBUYENTE REGISTRADO',
+                                regimen: parts[4]?.trim() || 'ORDINARIO',
+                                estado: parts[5]?.trim() || 'ACTIVO'
+                            });
 
-                        if (batch.length >= batchSize) {
-                            // Process batch without blocking the stream
-                            const currentBatch = batch;
-                            batch = [];
-                            
-                            try {
-                                const result = await storage.bulkCreateRNCRegistry(currentBatch);
-                                totalInserted += result.inserted;
-                                totalProcessed += currentBatch.length;
+                            if (batch.length >= BATCH_SIZE) {
+                                const currentBatch = batch;
+                                batch = [];
                                 
-                                // Log progress every 5 seconds
+                                try {
+                                    const result = await processBatchWithRetry(currentBatch);
+                                    totalInserted += result.inserted;
+                                } catch (batchError) {
+                                    console.error('Batch insert failed, falling back to individual inserts:', batchError);
+                                    const successCount = await processIndividualRecords(currentBatch);
+                                    totalInserted += successCount;
+                                }
+
+                                totalProcessed += currentBatch.length;
                                 if (Date.now() - lastProgressLog > 5000) {
-                                    console.log(`Processed ${totalProcessed} RNC records...`);
+                                    console.log(`Processed ${totalProcessed} records (${totalInserted} inserted)`);
                                     lastProgressLog = Date.now();
                                 }
-                            } catch (batchError) {
-                                console.error('Error processing batch:', batchError);
                             }
                         }
                     }
+                } catch (error) {
+                    console.error('Error processing chunk:', error);
                 }
             });
 
             readStream.on('end', async () => {
                 try {
-                    // Process remaining records in buffer
+                    // Process remaining records
                     if (batch.length > 0) {
-                        const result = await storage.bulkCreateRNCRegistry(batch);
-                        totalInserted += result.inserted;
+                        try {
+                            const result = await processBatchWithRetry(batch);
+                            totalInserted += result.inserted;
+                        } catch (error) {
+                            console.error('Final batch insert failed, falling back to individual:', error);
+                            const successCount = await processIndividualRecords(batch);
+                            totalInserted += successCount;
+                        }
                         totalProcessed += batch.length;
                     }
 
-                    console.log(`Database update completed: ${totalInserted} RNC records inserted`);
-                    resolve(true);
-                } catch (finalError) {
-                    console.error('Final batch processing error:', finalError);
+                    console.log(`Update completed. Total: ${totalProcessed} records, Successfully inserted: ${totalInserted}`);
+                    resolve(totalInserted > 0);
+                } catch (error) {
+                    console.error('Final processing error:', error);
                     resolve(false);
                 }
             });
@@ -441,12 +502,35 @@ private async updateDatabase(): Promise<boolean> {
                 console.error('File read error:', error);
                 resolve(false);
             });
+        });
+    } catch (error) {
+        console.error('Database update initialization error:', error);
+        return false;
+    }
+}
 
+/**
+ * Clear existing registry in chunks to avoid large transactions
+ */
+private async clearExistingRegistryInChunks(): Promise<void> {
+    const CHUNK_SIZE = 10000;
+    let offset = 0;
+    let hasMore = true;
+
+    console.log('Starting chunked registry cleanup...');
+    
+    while (hasMore) {
+        try {
+            const result = await storage.deleteRNCRecordsChunk(offset, CHUNK_SIZE);
+            offset += CHUNK_SIZE;
+            hasMore = result.affectedRows >= CHUNK_SIZE;
+            console.log(`Cleared ${offset} records...`);
+            await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between chunks
         } catch (error) {
-            console.error('Database update initialization error:', error);
-            resolve(false);
+            console.error('Error clearing chunk:', error);
+            throw error;
         }
-    });
+    }
 }
 
   /**
