@@ -418,6 +418,7 @@ export default function Customers() {
                     </Button>
                   </div>
                 ) : (
+       <div className="max-h-[500px] overflow-y-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -487,6 +488,7 @@ export default function Customers() {
                       ))}
                     </TableBody>
                   </Table>
+         </div>
                 )}
               </div>
             </CardContent>
