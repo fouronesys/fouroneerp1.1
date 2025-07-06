@@ -144,9 +144,50 @@ export default function Landing() {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 overflow-hidden">
         {/* Animated Background Elements */}
         <div className="fixed inset-0 z-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+          <motion.div 
+            className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3],
+              x: [0, 50, 0],
+              y: [0, -30, 0]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div 
+            className="absolute top-40 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.5, 0.2],
+              x: [0, -60, 0],
+              y: [0, 40, 0]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+          <motion.div 
+            className="absolute bottom-20 left-1/3 w-80 h-80 bg-green-500/10 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.4, 0.7, 0.4],
+              x: [0, 30, 0],
+              y: [0, -20, 0]
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 4
+            }}
+          />
         </div>
 
         {/* Navigation Bar */}
@@ -346,29 +387,61 @@ export default function Landing() {
                 {services.map((service, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ 
+                      duration: 0.8, 
+                      delay: index * 0.15,
+                      type: "spring",
+                      stiffness: 100,
+                      damping: 15
+                    }}
                     viewport={{ once: true }}
-                    whileHover={{ y: -10 }}
+                    whileHover={{ 
+                      y: -15, 
+                      scale: 1.02,
+                      transition: { 
+                        type: "spring", 
+                        stiffness: 400, 
+                        damping: 17 
+                      }
+                    }}
                   >
-                    <Card className="bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-800/70 transition-all duration-300 h-full group">
+                    <Card className="bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-800/70 hover:border-gray-600/70 transition-all duration-500 h-full group hover:shadow-xl hover:shadow-blue-500/10">
                       <CardContent className="p-6">
-                        <div className={`w-12 h-12 bg-gradient-to-br ${service.color} rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
+                        <motion.div 
+                          className={`w-12 h-12 bg-gradient-to-br ${service.color} rounded-lg flex items-center justify-center mx-auto mb-4`}
+                          whileHover={{ 
+                            scale: 1.2, 
+                            rotate: 360,
+                            transition: { 
+                              duration: 0.6,
+                              type: "spring",
+                              stiffness: 200
+                            }
+                          }}
+                        >
                           <service.icon className="w-6 h-6 text-white" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-white mb-3 text-center">
+                        </motion.div>
+                        <h3 className="text-lg font-semibold text-white mb-3 text-center group-hover:text-blue-200 transition-colors duration-300">
                           {service.title}
                         </h3>
-                        <p className="text-sm text-gray-300 mb-4 text-center">
+                        <p className="text-sm text-gray-300 mb-4 text-center group-hover:text-gray-200 transition-colors duration-300">
                           {service.description}
                         </p>
                         <div className="space-y-2">
                           {service.features.map((feature, idx) => (
-                            <div key={idx} className="flex items-center text-xs text-gray-400">
+                            <motion.div 
+                              key={idx} 
+                              className="flex items-center text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300"
+                              initial={{ opacity: 0, x: -20 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              transition={{ delay: (index * 0.15) + (idx * 0.1) }}
+                              viewport={{ once: true }}
+                            >
                               <Check className="w-3 h-3 text-green-400 mr-2 flex-shrink-0" />
                               {feature}
-                            </div>
+                            </motion.div>
                           ))}
                         </div>
                       </CardContent>
@@ -532,49 +605,81 @@ export default function Landing() {
                     <CardContent className="p-8">
                       <h3 className="text-2xl font-bold text-white mb-6">Envíanos un mensaje</h3>
                       <form onSubmit={handleContactSubmit} className="space-y-6">
-                        <div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.5, delay: 0.1 }}
+                          viewport={{ once: true }}
+                        >
                           <Input
                             placeholder="Tu nombre completo"
                             value={contactForm.name}
                             onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
-                            className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
+                            className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
                             required
                           />
-                        </div>
-                        <div>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.5, delay: 0.2 }}
+                          viewport={{ once: true }}
+                        >
                           <Input
                             type="email"
                             placeholder="tu@email.com"
                             value={contactForm.email}
                             onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
-                            className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
+                            className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
                             required
                           />
-                        </div>
-                        <div>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.5, delay: 0.3 }}
+                          viewport={{ once: true }}
+                        >
                           <Input
                             placeholder="Tu número de teléfono"
                             value={contactForm.phone}
                             onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
-                            className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
+                            className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
                           />
-                        </div>
-                        <div>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.5, delay: 0.4 }}
+                          viewport={{ once: true }}
+                        >
                           <Textarea
                             placeholder="Cuéntanos sobre tu proyecto..."
                             value={contactForm.message}
                             onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
-                            className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 min-h-[120px]"
+                            className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 min-h-[120px] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
                             required
                           />
-                        </div>
-                        <Button 
-                          type="submit"
-                          className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white py-3"
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5, delay: 0.5 }}
+                          viewport={{ once: true }}
                         >
-                          <Send className="w-4 h-4 mr-2" />
-                          Enviar Mensaje
-                        </Button>
+                          <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            <Button 
+                              type="submit"
+                              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white py-3 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25"
+                            >
+                              <Send className="w-4 h-4 mr-2" />
+                              Enviar Mensaje
+                            </Button>
+                          </motion.div>
+                        </motion.div>
                       </form>
                     </CardContent>
                   </Card>
@@ -623,21 +728,56 @@ export default function Landing() {
                   <div>
                     <h4 className="text-lg font-semibold text-white mb-4">Síguenos</h4>
                     <div className="flex space-x-4">
-                      <Button variant="outline" size="icon" className="border-gray-600 text-gray-300 hover:bg-blue-600 hover:border-blue-600">
-                        <Facebook className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="icon" className="border-gray-600 text-gray-300 hover:bg-blue-400 hover:border-blue-400">
-                        <Twitter className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="icon" className="border-gray-600 text-gray-300 hover:bg-pink-600 hover:border-pink-600">
-                        <Instagram className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="icon" className="border-gray-600 text-gray-300 hover:bg-blue-700 hover:border-blue-700">
-                        <Linkedin className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="icon" className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-800">
-                        <Github className="w-4 h-4" />
-                      </Button>
+                      <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => window.open("https://facebook.com/fouroneolutions", "_blank")}
+                          className="border-gray-600 text-gray-300 hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all duration-300"
+                        >
+                          <Facebook className="w-4 h-4" />
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => window.open("https://twitter.com/fourone_do", "_blank")}
+                          className="border-gray-600 text-gray-300 hover:bg-blue-400 hover:border-blue-400 hover:text-white transition-all duration-300"
+                        >
+                          <Twitter className="w-4 h-4" />
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => window.open("https://instagram.com/fourone.solutions", "_blank")}
+                          className="border-gray-600 text-gray-300 hover:bg-pink-600 hover:border-pink-600 hover:text-white transition-all duration-300"
+                        >
+                          <Instagram className="w-4 h-4" />
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => window.open("https://linkedin.com/company/four-one-solutions", "_blank")}
+                          className="border-gray-600 text-gray-300 hover:bg-blue-700 hover:border-blue-700 hover:text-white transition-all duration-300"
+                        >
+                          <Linkedin className="w-4 h-4" />
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => window.open("https://github.com/fourone-solutions", "_blank")}
+                          className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-800 hover:text-white transition-all duration-300"
+                        >
+                          <Github className="w-4 h-4" />
+                        </Button>
+                      </motion.div>
                     </div>
                   </div>
                 </motion.div>
@@ -649,7 +789,12 @@ export default function Landing() {
           <footer className="border-t border-gray-800/50 bg-black/20 backdrop-blur-sm">
             <div className="container mx-auto px-4 sm:px-6 py-8">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: true }}
+                >
                   <div className="flex items-center space-x-2 mb-4">
                     <img src={logoImage} alt="Four One Solutions Logo" className="w-8 h-8 object-contain" />
                     <span className="text-lg font-bold text-white">Four One Solutions</span>
@@ -657,45 +802,169 @@ export default function Landing() {
                   <p className="text-gray-400 text-sm">
                     Transformando empresas dominicanas a través de soluciones tecnológicas innovadoras y confiables.
                   </p>
-                </div>
-                <div>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                  viewport={{ once: true }}
+                >
                   <h5 className="text-white font-semibold mb-3">Servicios</h5>
                   <ul className="space-y-2 text-sm text-gray-400">
-                    <li>Sistemas ERP</li>
-                    <li>Desarrollo Web</li>
-                    <li>Apps Móviles</li>
-                    <li>E-commerce</li>
+                    <li>
+                      <button 
+                        onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Sistemas ERP
+                      </button>
+                    </li>
+                    <li>
+                      <button 
+                        onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Desarrollo Web
+                      </button>
+                    </li>
+                    <li>
+                      <button 
+                        onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Apps Móviles
+                      </button>
+                    </li>
+                    <li>
+                      <button 
+                        onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        E-commerce
+                      </button>
+                    </li>
                   </ul>
-                </div>
-                <div>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  viewport={{ once: true }}
+                >
                   <h5 className="text-white font-semibold mb-3">Empresa</h5>
                   <ul className="space-y-2 text-sm text-gray-400">
-                    <li>Nosotros</li>
-                    <li>Casos de Éxito</li>
-                    <li>Blog</li>
-                    <li>Carreras</li>
+                    <li>
+                      <button 
+                        onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Nosotros
+                      </button>
+                    </li>
+                    <li>
+                      <button 
+                        onClick={() => window.location.href = "/auth"}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Casos de Éxito
+                      </button>
+                    </li>
+                    <li>
+                      <button 
+                        onClick={() => window.location.href = "/auth"}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Blog
+                      </button>
+                    </li>
+                    <li>
+                      <button 
+                        onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Carreras
+                      </button>
+                    </li>
                   </ul>
-                </div>
-                <div>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  viewport={{ once: true }}
+                >
                   <h5 className="text-white font-semibold mb-3">Soporte</h5>
                   <ul className="space-y-2 text-sm text-gray-400">
-                    <li>Documentación</li>
-                    <li>API</li>
-                    <li>Centro de Ayuda</li>
-                    <li>Contacto</li>
+                    <li>
+                      <button 
+                        onClick={() => window.location.href = "/api-docs"}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Documentación
+                      </button>
+                    </li>
+                    <li>
+                      <button 
+                        onClick={() => window.location.href = "/api-docs"}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        API
+                      </button>
+                    </li>
+                    <li>
+                      <button 
+                        onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Centro de Ayuda
+                      </button>
+                    </li>
+                    <li>
+                      <button 
+                        onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="hover:text-white transition-colors text-left"
+                      >
+                        Contacto
+                      </button>
+                    </li>
                   </ul>
-                </div>
+                </motion.div>
               </div>
-              <div className="border-t border-gray-800/50 pt-6 flex flex-col sm:flex-row justify-between items-center">
+              
+              <motion.div 
+                className="border-t border-gray-800/50 pt-6 flex flex-col sm:flex-row justify-between items-center"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                viewport={{ once: true }}
+              >
                 <p className="text-gray-400 text-sm">
                   © 2025 Four One Solutions. Todos los derechos reservados.
                 </p>
                 <div className="flex space-x-6 mt-4 sm:mt-0 text-sm text-gray-400">
-                  <a href="#" className="hover:text-white">Privacidad</a>
-                  <a href="#" className="hover:text-white">Términos</a>
-                  <a href="#" className="hover:text-white">Cookies</a>
+                  <button 
+                    onClick={() => window.location.href = "/auth"}
+                    className="hover:text-white transition-colors"
+                  >
+                    Privacidad
+                  </button>
+                  <button 
+                    onClick={() => window.location.href = "/auth"}
+                    className="hover:text-white transition-colors"
+                  >
+                    Términos
+                  </button>
+                  <button 
+                    onClick={() => window.location.href = "/auth"}
+                    className="hover:text-white transition-colors"
+                  >
+                    Cookies
+                  </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </footer>
         </div>
