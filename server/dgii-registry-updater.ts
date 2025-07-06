@@ -353,9 +353,9 @@ private async extractAndProcessZip(): Promise<boolean> {
  * Update the database with new RNC data (stream optimized version)
  */
 private async updateDatabase(): Promise<boolean> {
-    const rncFilePath = './attached_assets/DGII_TXT.TXT';
+    const rncFilePath = './attached_assets/DGII_RNC.TXT';
     
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {  // Added async here
         try {
             if (!fs.existsSync(rncFilePath)) {
                 throw new Error('DGII_RNC.TXT file not found');
