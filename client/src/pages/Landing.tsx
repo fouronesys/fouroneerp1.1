@@ -535,9 +535,9 @@ export default function Landing() {
                 <ul className="space-y-3 mb-8">
                   {[
                     "Todo del plan mensual incluido",
-                    "✨ Herramientas IA avanzadas completas",
-                    "✨ Verificación RNC premium con historial",
-                    "✨ Búsqueda ilimitada de imágenes",
+                    "Herramientas IA avanzadas completas",
+                    "Verificación RNC con historial",
+                    "Búsqueda ilimitada de imágenes",
                     "Módulo de producción completo",
                     "Lista de materiales (BOM)",
                     "Gestión de recetas",
@@ -878,15 +878,7 @@ export default function Landing() {
             </h2>
             
             <div className="flex justify-center space-x-6">
-              <a 
-                href="https://facebook.com/fouronesolutions" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
-              >
-                <Facebook className="h-6 w-6 text-white" />
-              </a>
-              
+
               <a 
                 href="https://twitter.com/fouronesolutions" 
                 target="_blank" 
@@ -904,7 +896,7 @@ export default function Landing() {
               >
                 <Instagram className="h-6 w-6 text-white" />
               </a>
-              
+             {/* 
               <a 
                 href="https://linkedin.com/company/fouronesolutions" 
                 target="_blank" 
@@ -913,9 +905,9 @@ export default function Landing() {
               >
                 <Linkedin className="h-6 w-6 text-white" />
               </a>
-              
+              */}
               <a 
-                href="https://github.com/fouronesolutions" 
+                href="https://github.com/fouronesys" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-14 h-14 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
