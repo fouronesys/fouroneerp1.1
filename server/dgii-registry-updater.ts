@@ -26,7 +26,7 @@ export class DGIIRegistryUpdater {
 
   constructor() {
     this.config = {
-      downloadUrl: 'https://dgii.gov.do/wsMovilDGII/WSMovilDGII.asmx/GetContribuyentesZIP',
+      downloadUrl: 'https://dgii.gov.do/app/WebApps/Consultas/RNC/DGII_RNC.zip',
       downloadPath: './downloads/dgii_rnc.zip',
       extractPath: './downloads/extracted',
       updateIntervalHours: 24,
