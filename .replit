@@ -1,10 +1,10 @@
-modules = ["nodejs-20", "web", "postgresql-16", "java-graalvm22.3", "python-3.9"]
+modules = ["python-3.12", "nodejs-20", "web"]
 run = "npm run dev"
 hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["unzip", "cairo", "pango", "libjpeg", "giflib", "librsvg", "pixman", "libuuid", "jq"]
+packages = ["unzip", "cairo", "pango", "libjpeg", "giflib", "librsvg", "pixman", "libuuid", "jq", "postgresql"]
 
 [deployment]
 deploymentTarget = "autoscale"
