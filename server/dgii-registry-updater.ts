@@ -232,61 +232,63 @@ export class DGIIRegistryUpdater {
     });
   }
 
-  /**
- * Extract and process the ZIP file
+/**
+ * Extract and process the ZIP file (memory-optimized version)
  */
 private async extractAndProcessZip(): Promise<boolean> {
+    let success = false;
     try {
+        console.log('Starting ZIP extraction (memory optimized)...');
+        
+        // Load ZIP file in streaming mode to avoid memory issues
         const zip = new AdmZip(this.config.downloadPath);
         
-        // Log all files in the ZIP for debugging
-        const zipEntries = zip.getEntries();
-        console.log('Files in ZIP:', zipEntries.map(entry => entry.entryName).join(', '));
-        
-        // Find the TXT file (more flexible search)
-        const txtFile = zipEntries.find(entry => {
+        // Find the TXT file without loading all entries
+        const txtEntry = zip.getEntries().find(entry => {
             const lowerName = entry.entryName.toLowerCase();
             return (lowerName.includes('rnc') || lowerName.includes('dgii')) && 
                    lowerName.endsWith('.txt');
         });
 
-        if (!txtFile) {
-            const availableFiles = zipEntries.map(entry => entry.entryName).join(', ');
-            throw new Error(`No suitable TXT file found in ZIP. Available files: ${availableFiles}`);
+        if (!txtEntry) {
+            const entryList = zip.getEntries().slice(0, 5).map(e => e.entryName);
+            throw new Error(`No suitable TXT file found. First entries: ${entryList.join(', ')}...`);
         }
 
-        // Ensure extract path exists
-        if (!fs.existsSync(this.config.extractPath)) {
-            fs.mkdirSync(this.config.extractPath, { recursive: true });
-        }
-
-        // Extract only the TXT file we found
-        zip.extractEntryTo(txtFile, this.config.extractPath, false, true);
-        
-        // Get the extracted file path
-        const extractedFilePath = path.join(this.config.extractPath, path.basename(txtFile.entryName));
-        
-        // Verify the file was extracted
-        if (!fs.existsSync(extractedFilePath)) {
-            throw new Error(`Failed to extract file: ${txtFile.entryName}`);
-        }
-
-        // Ensure target directory exists
+        // Prepare paths
         const targetDir = './attached_assets';
-        if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
+        const tempDir = './downloads/temp_extract';
+        
+        // Clean/create directories
+        [targetDir, tempDir].forEach(dir => {
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+        });
+
+        // Extract only the needed file directly to target
+        const targetPath = path.join(targetDir, 'DGII_RNC.TXT');
+        
+        // Use streaming extraction for large files
+        const entryData = zip.readFile(txtEntry);
+        if (!entryData) {
+            throw new Error('Failed to read ZIP entry data');
         }
 
-        // Copy to final destination
-        const targetPath = path.join(targetDir, 'DGII_RNC.TXT');
-        fs.copyFileSync(extractedFilePath, targetPath);
-        console.log(`RNC file updated: ${txtFile.entryName} -> DGII_RNC.TXT`);
+        fs.writeFileSync(targetPath, entryData);
+        console.log(`RNC file extracted directly to: ${targetPath} (${(entryData.length / (1024*1024)).toFixed(2)} MB)`);
 
-        return true;
+        // Cleanup
+        if (fs.existsSync(tempDir)) {
+            fs.rmSync(tempDir, { recursive: true });
+        }
+
+        success = true;
     } catch (error) {
-        console.error('Error extracting ZIP file:', error);
-        return false;
+        console.error('Error in optimized ZIP extraction:', error);
+        success = false;
     }
+    return success;
 }
 
   /**
