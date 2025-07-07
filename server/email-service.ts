@@ -435,3 +435,86 @@ Sistema de Four One Solutions
   const results = await Promise.all(promises);
   return results.every(r => r === true);
 }
+
+// Función para enviar formulario de contacto
+export async function sendContactFormEmail(contactData: {
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+}): Promise<boolean> {
+  const subject = `Nuevo mensaje de contacto de ${contactData.name} - Four One Solutions`;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #1e40af;">📧 Nuevo mensaje de contacto</h2>
+      
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;"><strong>Nombre:</strong></td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;">${contactData.name}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;"><strong>Email:</strong></td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;"><a href="mailto:${contactData.email}" style="color: #1e40af;">${contactData.email}</a></td>
+          </tr>
+          ${contactData.phone ? `
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;"><strong>Teléfono:</strong></td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;"><a href="tel:+1829${contactData.phone}" style="color: #1e40af;">${contactData.phone}</a></td>
+          </tr>
+          ` : ''}
+          <tr>
+            <td style="padding: 8px 0;"><strong>Mensaje:</strong></td>
+            <td style="padding: 8px 0;"></td>
+          </tr>
+        </table>
+        
+        <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; margin-top: 10px;">
+          <p style="margin: 0; white-space: pre-line;">${contactData.message}</p>
+        </div>
+      </div>
+      
+      <div style="background-color: #eff6ff; border-left: 4px solid #1e40af; padding: 15px; margin: 20px 0;">
+        <h4 style="color: #1e40af; margin-top: 0;">Acciones sugeridas:</h4>
+        <ul style="color: #1e3a8a; margin-bottom: 0;">
+          <li>Responder al email: <a href="mailto:${contactData.email}" style="color: #1e40af;">${contactData.email}</a></li>
+          ${contactData.phone ? `<li>Llamar al teléfono: <a href="tel:+1829${contactData.phone}" style="color: #1e40af;">+1 (829) ${contactData.phone}</a></li>` : ''}
+          <li>Registrar en el CRM para seguimiento</li>
+        </ul>
+      </div>
+      
+      <p style="font-size: 12px; color: #64748b;">
+        Este mensaje fue enviado desde el formulario de contacto del sitio web de Four One Solutions.
+        <br>Fecha: ${new Date().toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' })}
+      </p>
+    </div>
+  `;
+  
+  const text = `
+Nuevo mensaje de contacto - Four One Solutions
+
+Nombre: ${contactData.name}
+Email: ${contactData.email}
+${contactData.phone ? `Teléfono: ${contactData.phone}` : ''}
+
+Mensaje:
+${contactData.message}
+
+Acciones sugeridas:
+- Responder al email: ${contactData.email}
+${contactData.phone ? `- Llamar al teléfono: +1 (829) ${contactData.phone}` : ''}
+- Registrar en el CRM para seguimiento
+
+Este mensaje fue enviado desde el formulario de contacto del sitio web.
+Fecha: ${new Date().toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' })}
+  `;
+
+  return await sendEmail({
+    to: 'info@fourone.com.do',
+    subject,
+    text,
+    html
+  });
+}

@@ -5,14 +5,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { SEOHead } from "@/components/SEOHead";
 import { 
-  Check, Shield, Star, Code, Globe, Smartphone, 
-  Palette, Mail, Phone, MapPin, Send, ArrowRight,
-  Facebook, Twitter, Instagram, Linkedin, Github,
-  Zap, Target, Users, Building, PieChart, 
-  ShoppingCart, Truck, Factory, Calculator,
-  HeadphonesIcon, Cloud, Database, Lock,
+  Check, Shield, Star, Code, Smartphone, 
+  Mail, Phone, MapPin, Send, ArrowRight,
+  Instagram,  Github,
+  Users, Building, PieChart, 
+  ShoppingCart,
+  HeadphonesIcon, Cloud,
   Award, TrendingUp, Clock, CheckCircle2,
-  Sparkles, Monitor, BookOpen, MessageSquare
+  Sparkles, Monitor, MessageSquare
 } from "lucide-react";
 import { InstallButton } from "@/components/InstallButton";
 import logoImage from "@assets/Four One Solutions Logo_20250603_002341_0000.png";
@@ -37,13 +37,41 @@ export default function Landing() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Mensaje enviado",
-      description: "Gracias por contactarnos. Te responderemos pronto.",
-    });
-    setContactForm({ name: '', email: '', phone: '', message: '' });
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactForm),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast({
+          title: "¡Mensaje enviado exitosamente!",
+          description: "Te contactaremos pronto desde info@fourone.com.do",
+        });
+        setContactForm({ name: '', email: '', phone: '', message: '' });
+      } else {
+        toast({
+          title: "Error al enviar mensaje",
+          description: result.message || "Intenta nuevamente",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error sending contact form:', error);
+      toast({
+        title: "Error de conexión",
+        description: "Verifica tu conexión e intenta nuevamente",
+        variant: "destructive"
+      });
+    }
   };
 
   const services = [
@@ -136,9 +164,48 @@ export default function Landing() {
   return (
     <>
       <SEOHead 
-        title="Four One Solutions - Desarrollo de Software y Sistemas ERP en República Dominicana"
-        description="Especialistas en desarrollo de software, sistemas ERP, aplicaciones móviles y soluciones tecnológicas empresariales en República Dominicana. Cumplimiento fiscal DGII, facturación NCF automática."
-        keywords="desarrollo software dominicana, sistema ERP dominicana, facturación NCF, DGII, aplicaciones móviles, e-commerce, consultoría tecnológica"
+        title="Four One Solutions - Líder en Desarrollo de Software ERP en República Dominicana | Moca"
+        description="🏆 #1 en desarrollo de software empresarial en República Dominicana. Sistemas ERP, facturación NCF DGII, apps móviles, e-commerce. Ubicados en Moca. ✅ Cumplimiento fiscal dominicano. ☎️ (829) 351-9324"
+        keywords="desarrollo software república dominicana, sistema ERP dominicana, facturación NCF DGII, Four One Solutions Moca, software empresarial dominicano, aplicaciones móviles RD, e-commerce dominicana, consultoría tecnológica santiago, POS system dominicana, inventario empresarial, contabilidad automatizada dominicana, transformación digital empresas"
+      />
+      
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Four One Solutions",
+            "url": "https://fourone.com.do",
+            "logo": "https://fourone.com.do/logo.png",
+            "description": "Líder en desarrollo de software empresarial, sistemas ERP, y soluciones tecnológicas en República Dominicana",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Moca",
+              "addressCountry": "DO",
+              "addressRegion": "Espaillat"
+            },
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "+1-829-351-9324",
+              "contactType": "customer service",
+              "availableLanguage": "Spanish"
+            },
+            "sameAs": [
+              "https://facebook.com/fouroneolutions",
+              "https://twitter.com/fourone_do",
+              "https://linkedin.com/company/four-one-solutions"
+            ],
+            "services": [
+              "Desarrollo de Software ERP",
+              "Sistemas de Facturación NCF",
+              "Aplicaciones Móviles",
+              "E-commerce",
+              "Consultoría Tecnológica"
+            ]
+          })
+        }}
       />
       
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 overflow-hidden">
@@ -147,45 +214,45 @@ export default function Landing() {
           <motion.div 
             className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"
             animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.6, 0.3],
-              x: [0, 50, 0],
-              y: [0, -30, 0]
+              scale: [1, 1.1, 1],
+              opacity: [0.2, 0.4, 0.2],
+              x: [0, 30, 0],
+              y: [0, -20, 0]
             }}
             transition={{
-              duration: 8,
+              duration: 6,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: [0.4, 0, 0.6, 1]
             }}
           />
           <motion.div 
             className="absolute top-40 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"
             animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.2, 0.5, 0.2],
-              x: [0, -60, 0],
-              y: [0, 40, 0]
+              scale: [1, 1.2, 1],
+              opacity: [0.1, 0.3, 0.1],
+              x: [0, -40, 0],
+              y: [0, 25, 0]
             }}
             transition={{
-              duration: 10,
+              duration: 8,
               repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
+              ease: [0.4, 0, 0.6, 1],
+              delay: 1
             }}
           />
           <motion.div 
             className="absolute bottom-20 left-1/3 w-80 h-80 bg-green-500/10 rounded-full blur-3xl"
             animate={{
-              scale: [1, 1.1, 1],
-              opacity: [0.4, 0.7, 0.4],
-              x: [0, 30, 0],
-              y: [0, -20, 0]
+              scale: [1, 1.05, 1],
+              opacity: [0.3, 0.5, 0.3],
+              x: [0, 20, 0],
+              y: [0, -15, 0]
             }}
             transition={{
-              duration: 12,
+              duration: 10,
               repeat: Infinity,
-              ease: "easeInOut",
-              delay: 4
+              ease: [0.4, 0, 0.6, 1],
+              delay: 2
             }}
           />
         </div>
@@ -390,20 +457,23 @@ export default function Landing() {
                     initial={{ opacity: 0, y: 50, scale: 0.9 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ 
-                      duration: 0.8, 
-                      delay: index * 0.15,
+                      duration: 0.6, 
+                      delay: index * 0.08,
                       type: "spring",
-                      stiffness: 100,
-                      damping: 15
+                      stiffness: 200,
+                      damping: 12,
+                      mass: 0.5
                     }}
                     viewport={{ once: true }}
                     whileHover={{ 
-                      y: -15, 
-                      scale: 1.02,
+                      y: -12, 
+                      scale: 1.03,
+                      rotateY: 5,
                       transition: { 
                         type: "spring", 
-                        stiffness: 400, 
-                        damping: 17 
+                        stiffness: 500, 
+                        damping: 15,
+                        mass: 0.3
                       }
                     }}
                   >
@@ -412,12 +482,13 @@ export default function Landing() {
                         <motion.div 
                           className={`w-12 h-12 bg-gradient-to-br ${service.color} rounded-lg flex items-center justify-center mx-auto mb-4`}
                           whileHover={{ 
-                            scale: 1.2, 
-                            rotate: 360,
+                            scale: 1.15, 
+                            rotate: 15,
                             transition: { 
-                              duration: 0.6,
+                              duration: 0.3,
                               type: "spring",
-                              stiffness: 200
+                              stiffness: 400,
+                              damping: 10
                             }
                           }}
                         >
@@ -701,7 +772,35 @@ export default function Landing() {
                         </div>
                         <div>
                           <div className="text-white font-medium">Teléfono</div>
-                          <div className="text-gray-300">+1 (809) 555-0123</div>
+                          <a href="tel:+18293519324" className="text-gray-300 hover:text-white transition-colors">
+                            +1 (829) 351-9324
+                          </a>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center mr-4">
+                          <MessageSquare className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-white font-medium">WhatsApp</div>
+                          <motion.button
+                            onClick={() => window.open("https://wa.me/18293519324?text=Hola%2C%20me%20interesa%20conocer%20más%20sobre%20los%20servicios%20de%20Four%20One%20Solutions", "_blank")}
+                            className="text-gray-300 hover:text-white transition-colors flex items-center"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            +1 (829) 351-9324
+                            <ArrowRight className="w-4 h-4 ml-1" />
+                          </motion.button>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center mr-4">
+                          <MapPin className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-white font-medium">Ubicación</div>
+                          <div className="text-gray-300">Moca, República Dominicana</div>
                         </div>
                       </div>
                       <div className="flex items-center">
@@ -710,17 +809,11 @@ export default function Landing() {
                         </div>
                         <div>
                           <div className="text-white font-medium">Email</div>
-                          <div className="text-gray-300">info@fourone.com.do</div>
+                          <a href="mailto:info@fourone.com.do" className="text-gray-300 hover:text-white transition-colors">
+                            info@fourone.com.do
+                          </a>
                         </div>
                       </div>
-                      <div className="flex items-center">
-                        <div className="w-12 h-12 bg-gradient-to-br from-orange-600 to-red-600 rounded-lg flex items-center justify-center mr-4">
-                          <MapPin className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="text-white font-medium">Ubicación</div>
-                          <div className="text-gray-300">Santo Domingo, República Dominicana</div>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -728,51 +821,24 @@ export default function Landing() {
                   <div>
                     <h4 className="text-lg font-semibold text-white mb-4">Síguenos</h4>
                     <div className="flex space-x-4">
+                  
+                   
                       <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
                         <Button 
                           variant="outline" 
                           size="icon" 
-                          onClick={() => window.open("https://facebook.com/fouroneolutions", "_blank")}
-                          className="border-gray-600 text-gray-300 hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all duration-300"
-                        >
-                          <Facebook className="w-4 h-4" />
-                        </Button>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          onClick={() => window.open("https://twitter.com/fourone_do", "_blank")}
-                          className="border-gray-600 text-gray-300 hover:bg-blue-400 hover:border-blue-400 hover:text-white transition-all duration-300"
-                        >
-                          <Twitter className="w-4 h-4" />
-                        </Button>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          onClick={() => window.open("https://instagram.com/fourone.solutions", "_blank")}
+                          onClick={() => window.open("https://instagram.com/fourone.solutionssrl", "_blank")}
                           className="border-gray-600 text-gray-300 hover:bg-pink-600 hover:border-pink-600 hover:text-white transition-all duration-300"
                         >
                           <Instagram className="w-4 h-4" />
                         </Button>
                       </motion.div>
+                  
                       <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
                         <Button 
                           variant="outline" 
                           size="icon" 
-                          onClick={() => window.open("https://linkedin.com/company/four-one-solutions", "_blank")}
-                          className="border-gray-600 text-gray-300 hover:bg-blue-700 hover:border-blue-700 hover:text-white transition-all duration-300"
-                        >
-                          <Linkedin className="w-4 h-4" />
-                        </Button>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}>
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          onClick={() => window.open("https://github.com/fourone-solutions", "_blank")}
+                          onClick={() => window.open("https://github.com/fouronesys/fouroneerp1.1", "_blank")}
                           className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-800 hover:text-white transition-all duration-300"
                         >
                           <Github className="w-4 h-4" />

@@ -7,7 +7,7 @@ import { setupAuth, isAuthenticated, hashPassword, comparePasswords } from "./au
 import { auditLogger } from "./audit-logger";
 import { initializeAdminUser } from "./init-admin";
 import { moduleInitializer } from "./module-initializer";
-import { sendApiKeyEmail, sendUserCredentialsEmail, sendNCFExpirationNotification, sendSystemNotification } from "./email-service";
+import { sendApiKeyEmail, sendUserCredentialsEmail, sendNCFExpirationNotification, sendSystemNotification, sendContactFormEmail } from "./email-service";
 import { 
   sendPasswordResetEmail, 
   sendRegistrationConfirmationEmail, 
@@ -1449,6 +1449,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error in extended email testing:", error);
       res.status(500).json({ message: "Failed to test extended email functions", error: error.message });
+    }
+  });
+
+  // Contact form endpoint
+  app.post("/api/contact", async (req: any, res) => {
+    try {
+      const { name, email, phone, message } = req.body;
+      
+      // Validate required fields
+      if (!name || !email || !message) {
+        return res.status(400).json({ 
+          message: "Nombre, email y mensaje son requeridos" 
+        });
+      }
+
+      // Send email using Brevo service
+      const emailSent = await sendContactFormEmail({
+        name,
+        email,
+        phone,
+        message
+      });
+
+      if (emailSent) {
+        res.json({ 
+          success: true, 
+          message: "Mensaje enviado exitosamente. Te contactaremos pronto." 
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: "Error al enviar el mensaje. Intenta nuevamente." 
+        });
+      }
+    } catch (error) {
+      console.error("Error processing contact form:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Error interno del servidor. Intenta nuevamente." 
+      });
     }
   });
 
