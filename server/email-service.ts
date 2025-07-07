@@ -518,3 +518,160 @@ Fecha: ${new Date().toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' 
     html
   });
 }
+
+// Función para enviar solicitudes de cotización
+export async function sendQuoteRequestEmail(quoteData: {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  rnc: string;
+  service: string;
+  projectDescription: string;
+  budget: string;
+  timeline: string;
+  rncValid: string;
+  companyNameFromRNC: string;
+}): Promise<boolean> {
+  const subject = `Nueva Solicitud de Cotización - ${quoteData.company}`;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; background-color: #f8fafc; padding: 20px;">
+      <div style="background-color: #ffffff; border-radius: 8px; padding: 30px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e40af; padding-bottom: 20px;">
+          <h1 style="color: #1e40af; margin: 0; font-size: 28px;">Nueva Solicitud de Cotización</h1>
+          <p style="color: #64748b; margin: 10px 0 0 0; font-size: 16px;">Four One Solutions</p>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px;">Información del Cliente</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 8px 0; color: #4b5563; font-weight: bold; width: 30%;">Nombre:</td>
+              <td style="padding: 8px 0; color: #1f2937;">${quoteData.name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #4b5563; font-weight: bold;">Email:</td>
+              <td style="padding: 8px 0;"><a href="mailto:${quoteData.email}" style="color: #1e40af; text-decoration: none;">${quoteData.email}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #4b5563; font-weight: bold;">Teléfono:</td>
+              <td style="padding: 8px 0;"><a href="tel:+1829${quoteData.phone}" style="color: #1e40af; text-decoration: none;">+1 (829) ${quoteData.phone}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #4b5563; font-weight: bold;">Empresa:</td>
+              <td style="padding: 8px 0; color: #1f2937; font-weight: bold;">${quoteData.company}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #4b5563; font-weight: bold;">RNC:</td>
+              <td style="padding: 8px 0; color: #1f2937;">
+                ${quoteData.rnc}
+                <span style="display: inline-block; margin-left: 10px; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; ${quoteData.rncValid === 'Sí' ? 'background-color: #dcfce7; color: #166534;' : 'background-color: #fef2f2; color: #dc2626;'}">
+                  ${quoteData.rncValid === 'Sí' ? '✓ RNC Válido' : '✗ RNC No Válido'}
+                </span>
+              </td>
+            </tr>
+            ${quoteData.companyNameFromRNC !== 'N/A' ? `
+            <tr>
+              <td style="padding: 8px 0; color: #4b5563; font-weight: bold;">Nombre DGII:</td>
+              <td style="padding: 8px 0; color: #1f2937; font-style: italic;">${quoteData.companyNameFromRNC}</td>
+            </tr>
+            ` : ''}
+          </table>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px;">Detalles del Proyecto</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 8px 0; color: #4b5563; font-weight: bold; width: 30%;">Servicio:</td>
+              <td style="padding: 8px 0; color: #1f2937; font-weight: bold;">${quoteData.service}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #4b5563; font-weight: bold;">Presupuesto:</td>
+              <td style="padding: 8px 0; color: #1f2937;">${quoteData.budget}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #4b5563; font-weight: bold;">Tiempo Deseado:</td>
+              <td style="padding: 8px 0; color: #1f2937;">${quoteData.timeline}</td>
+            </tr>
+          </table>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px;">Descripción del Proyecto</h2>
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 20px;">
+            <p style="margin: 0; white-space: pre-line; color: #1f2937; line-height: 1.6;">${quoteData.projectDescription}</p>
+          </div>
+        </div>
+        
+        <div style="background-color: #eff6ff; border-left: 4px solid #1e40af; padding: 20px; margin: 25px 0; border-radius: 0 6px 6px 0;">
+          <h3 style="color: #1e40af; margin-top: 0; margin-bottom: 15px;">Próximos Pasos</h3>
+          <ul style="color: #1e3a8a; margin-bottom: 0; padding-left: 20px;">
+            <li style="margin-bottom: 8px;">Responder al cliente en un plazo máximo de 4 horas</li>
+            <li style="margin-bottom: 8px;">Agendar reunión de descubrimiento si es necesario</li>
+            <li style="margin-bottom: 8px;">Preparar propuesta técnica detallada</li>
+            <li style="margin-bottom: 8px;">Registrar oportunidad en el CRM</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+          <p style="font-size: 14px; color: #64748b; margin: 0;">
+            Solicitud recibida el ${new Date().toLocaleString('es-DO', { 
+              timeZone: 'America/Santo_Domingo',
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  const text = `
+Nueva Solicitud de Cotización - Four One Solutions
+
+INFORMACIÓN DEL CLIENTE:
+• Nombre: ${quoteData.name}
+• Email: ${quoteData.email}
+• Teléfono: +1 (829) ${quoteData.phone}
+• Empresa: ${quoteData.company}
+• RNC: ${quoteData.rnc} (${quoteData.rncValid})
+${quoteData.companyNameFromRNC !== 'N/A' ? `• Nombre DGII: ${quoteData.companyNameFromRNC}` : ''}
+
+DETALLES DEL PROYECTO:
+• Servicio: ${quoteData.service}
+• Presupuesto: ${quoteData.budget}
+• Tiempo Deseado: ${quoteData.timeline}
+
+DESCRIPCIÓN DEL PROYECTO:
+${quoteData.projectDescription}
+
+PRÓXIMOS PASOS:
+- Responder al cliente en un plazo máximo de 4 horas
+- Agendar reunión de descubrimiento si es necesario
+- Preparar propuesta técnica detallada
+- Registrar oportunidad en el CRM
+
+Solicitud recibida el ${new Date().toLocaleString('es-DO', { 
+  timeZone: 'America/Santo_Domingo',
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+})}
+  `;
+
+  return await sendEmail({
+    to: 'info@fourone.com.do',
+    subject,
+    text,
+    html
+  });
+}

@@ -8,7 +8,7 @@ import { setupAuth, isAuthenticated, hashPassword, comparePasswords } from "./au
 import { auditLogger } from "./audit-logger";
 import { initializeAdminUser } from "./init-admin";
 import { moduleInitializer } from "./module-initializer";
-import { sendApiKeyEmail, sendUserCredentialsEmail, sendNCFExpirationNotification, sendSystemNotification, sendContactFormEmail } from "./email-service";
+import { sendApiKeyEmail, sendUserCredentialsEmail, sendNCFExpirationNotification, sendSystemNotification, sendContactFormEmail, sendQuoteRequestEmail } from "./email-service";
 import { 
   sendPasswordResetEmail, 
   sendRegistrationConfirmationEmail, 
@@ -8330,6 +8330,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting sitemap status:", error);
       res.status(500).json({ message: "Failed to get sitemap status" });
+    }
+  });
+
+  // RNC validation endpoint (public, no authentication required)
+  app.post("/api/validate-rnc", async (req, res) => {
+    try {
+      const { rnc } = req.body;
+      
+      if (!rnc) {
+        return res.status(400).json({
+          isValid: false,
+          error: "RNC is required"
+        });
+      }
+
+      // Use the existing DGII service to validate RNC
+      try {
+        const result = await CedulaValidationService.validateCedula(rnc);
+        res.json(result);
+      } catch (error) {
+        console.error('RNC validation error:', error);
+        res.json({
+          isValid: false,
+          error: "Error validating RNC"
+        });
+      }
+    } catch (error) {
+      console.error('RNC validation endpoint error:', error);
+      res.status(500).json({
+        isValid: false,
+        error: "Internal server error"
+      });
+    }
+  });
+
+  // Quote request endpoint (public, no authentication required)
+  app.post("/api/quote-request", async (req, res) => {
+    try {
+      const {
+        name, email, phone, company, rnc, service, projectDescription,
+        budget, timeline, rncValid, companyNameFromRNC
+      } = req.body;
+
+      // Basic validation
+      if (!name || !email || !phone || !company || !service || !projectDescription) {
+        return res.status(400).json({
+          success: false,
+          message: "Faltan campos obligatorios: nombre, email, teléfono, empresa, servicio y descripción"
+        });
+      }
+
+      // Send email using BREVO
+      try {
+        await sendQuoteRequestEmail({
+          name,
+          email,
+          phone,
+          company,
+          rnc: rnc || 'No proporcionado',
+          service,
+          projectDescription,
+          budget: budget || 'No especificado',
+          timeline: timeline || 'Flexible',
+          rncValid: rncValid ? 'Sí' : (rnc ? 'No válido' : 'No verificado'),
+          companyNameFromRNC: companyNameFromRNC || 'N/A'
+        });
+
+        // Log the quote request (optional audit)
+        await auditLogger.log({
+          module: 'quotes',
+          action: 'quote_request',
+          entityType: 'quote_request',
+          newValues: {
+            name,
+            email,
+            company,
+            service,
+            budget,
+            timeline
+          },
+          timestamp: new Date(),
+          success: true,
+          severity: 'info'
+        });
+
+        res.json({
+          success: true,
+          message: "Solicitud de cotización enviada exitosamente"
+        });
+
+      } catch (emailError) {
+        console.error('Error sending quote request email:', emailError);
+        res.status(500).json({
+          success: false,
+          message: "Error al enviar la solicitud. Intenta nuevamente o contacta directamente a info@fourone.com.do"
+        });
+      }
+
+    } catch (error) {
+      console.error('Error processing quote request:', error);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor"
+      });
     }
   });
 

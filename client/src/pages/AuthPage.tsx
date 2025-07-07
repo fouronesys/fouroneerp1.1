@@ -420,8 +420,8 @@ export default function AuthPage() {
 
   const handleAnimationComplete = () => {
     setShowLoginAnimation(false);
-    // Clear any router cache and force reload
-    window.location.replace("/");
+    // Redirect to dashboard after successful login
+    window.location.replace("/dashboard");
   };
 
   return (

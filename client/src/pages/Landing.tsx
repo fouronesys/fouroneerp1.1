@@ -209,50 +209,50 @@ export default function Landing() {
       />
       
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 overflow-hidden">
-        {/* Animated Background Elements */}
+        {/* Optimized Background Elements */}
         <div className="fixed inset-0 z-0">
           <motion.div 
-            className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.1, 1],
-              opacity: [0.2, 0.4, 0.2],
-              x: [0, 30, 0],
-              y: [0, -20, 0]
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: [0.4, 0, 0.6, 1]
-            }}
-          />
-          <motion.div 
-            className="absolute top-40 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.3, 0.1],
-              x: [0, -40, 0],
-              y: [0, 25, 0]
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: [0.4, 0, 0.6, 1],
-              delay: 1
-            }}
-          />
-          <motion.div 
-            className="absolute bottom-20 left-1/3 w-80 h-80 bg-green-500/10 rounded-full blur-3xl"
+            className="absolute top-20 left-10 w-72 h-72 bg-blue-500/8 rounded-full blur-3xl"
             animate={{
               scale: [1, 1.05, 1],
-              opacity: [0.3, 0.5, 0.3],
-              x: [0, 20, 0],
-              y: [0, -15, 0]
+              opacity: [0.15, 0.25, 0.15],
+              x: [0, 15, 0],
+              y: [0, -10, 0]
             }}
             transition={{
-              duration: 10,
+              duration: 12,
               repeat: Infinity,
-              ease: [0.4, 0, 0.6, 1],
-              delay: 2
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div 
+            className="absolute top-40 right-20 w-96 h-96 bg-purple-500/6 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.08, 1],
+              opacity: [0.08, 0.18, 0.08],
+              x: [0, -20, 0],
+              y: [0, 12, 0]
+            }}
+            transition={{
+              duration: 16,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 4
+            }}
+          />
+          <motion.div 
+            className="absolute bottom-20 left-1/3 w-80 h-80 bg-green-500/7 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.03, 1],
+              opacity: [0.2, 0.3, 0.2],
+              x: [0, 10, 0],
+              y: [0, -8, 0]
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 8
             }}
           />
         </div>
@@ -393,7 +393,7 @@ export default function Landing() {
                   transition={{ duration: 0.8, delay: 0.8 }}
                 >
                   <Button 
-                    onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={() => window.location.href = "/quote-request"}
                     size="lg"
                     className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg border-none shadow-lg hover:shadow-xl transition-all group"
                   >

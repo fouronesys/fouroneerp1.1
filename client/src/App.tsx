@@ -19,6 +19,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Pages
 import Landing from "@/pages/Landing";
+import QuoteRequest from "@/pages/QuoteRequest";
 import AuthPage from "@/pages/AuthPage";
 import Dashboard from "@/pages/Dashboard";
 import Billing from "@/pages/Billing";
@@ -248,6 +249,7 @@ function Router() {
       <Switch>
         <Route path="/auth" component={AuthPage} />
         <Route path="/register" component={AuthPage} />
+        <Route path="/quote-request" component={QuoteRequest} />
         <Route path="/verify/sale/:saleId" component={VerifySale} />
         <Route path="/api-registration" component={ApiRegistration} />
         <Route path="/api-docs" component={ApiDocs} />
