@@ -28,7 +28,7 @@ export async function initializeAdminUser() {
       password: hashedPassword,
       firstName: "Super",
       lastName: "Admin",
-      role: "super_admin",
+      role: "super_admin", // Always super_admin for system administrator
       isActive: true,
       phoneNumber: "8293519324"
     };
@@ -44,7 +44,10 @@ export async function initializeAdminUser() {
       phone: "8293519324",
       email: "jesus@fourone.com",
       website: "https://fourone.com.do",
-      ownerId: adminUser.id
+      ownerId: adminUser.id,
+      paymentConfirmed: true, // Always confirmed for super admin
+      paymentStatus: "confirmed",
+      subscriptionPlan: "enterprise"
     };
 
     const company = await storage.createCompany(companyData);
