@@ -8345,10 +8345,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Use the existing DGII service to validate RNC
+      // Use the same DGII RNC lookup as other modules
       try {
-        const result = await CedulaValidationService.validateCedula(rnc);
-        res.json(result);
+        const result = await storage.lookupRNC(rnc);
+        
+        if (result.success && result.data) {
+          res.json({
+            isValid: true,
+            companyName: result.data.name || result.data.razonSocial,
+            rnc: result.data.rnc,
+            status: result.data.status || result.data.estado,
+            category: result.data.category || result.data.categoria
+          });
+        } else {
+          res.json({
+            isValid: false,
+            error: result.message || "RNC no encontrado en el registro DGII"
+          });
+        }
       } catch (error) {
         console.error('RNC validation error:', error);
         res.json({

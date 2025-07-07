@@ -71,13 +71,13 @@ export default function QuoteRequest() {
       if (response.ok && result.isValid) {
         setRncValidation({
           isValid: true,
-          companyName: result.citizen?.fullName || result.citizen?.firstName + ' ' + result.citizen?.lastName || '',
+          companyName: result.companyName || '',
           isValidating: false
         });
         
         // Auto-fill company name if available
-        if (result.citizen?.fullName && !quoteForm.company) {
-          setQuoteForm(prev => ({ ...prev, company: result.citizen.fullName }));
+        if (result.companyName && !quoteForm.company) {
+          setQuoteForm(prev => ({ ...prev, company: result.companyName }));
         }
       } else {
         setRncValidation({

@@ -421,7 +421,7 @@ export default function AuthPage() {
   const handleAnimationComplete = () => {
     setShowLoginAnimation(false);
     // Redirect to dashboard after successful login
-    window.location.replace("/dashboard");
+    window.location.replace("/");
   };
 
   return (
