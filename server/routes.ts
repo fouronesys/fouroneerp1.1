@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import express from "express";
 import multer from "multer";
 import session from "express-session";
 import { storage } from "./storage";
@@ -80,6 +81,9 @@ function superAdminOnly(req: any, res: any, next: any) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication middleware
   setupAuth(app);
+
+  // Serve static files from uploads directory
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
   // Session heartbeat endpoint to keep sessions alive during deployments
   app.post("/api/auth/heartbeat", isAuthenticated, async (req: any, res) => {

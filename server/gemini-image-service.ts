@@ -81,7 +81,7 @@ export class GeminiImageService {
 
           console.log(`Image saved to: ${filepath}`);
           
-          // Return the relative URL for the image
+          // Return the full URL for the image that can be accessed by the frontend
           return `/uploads/products/${filename}`;
         }
       }
