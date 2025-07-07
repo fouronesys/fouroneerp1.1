@@ -183,11 +183,10 @@ export default function Products() {
     });
   },
   onSuccess: (data, variables) => {
-    // Actualiza la imagen en el formulario si corresponde
-    if (form.getValues("name") === variables.productName) {
-      form.setValue("imageUrl", data.imageUrl);
-      setCurrentImageUrl(data.imageUrl);
-    }
+    // Siempre actualiza la imagen en el formulario cuando se genera
+    form.setValue("imageUrl", data.imageUrl);
+    setCurrentImageUrl(data.imageUrl);
+    
     // Invalida y actualiza la lista
     queryClient.invalidateQueries({ queryKey: ["/api/products"], exact: true });
     queryClient.refetchQueries({ queryKey: ["/api/products"], exact: true });
