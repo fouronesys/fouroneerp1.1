@@ -201,6 +201,14 @@ The system follows a monolithic architecture with clear separation of concerns:
   - **Dynamic Updates**: Automatic sitemap generation on server startup and API endpoint for manual updates
   - **Search Engine Ready**: Accessible at /sitemap.xml and /robots.txt for search engine crawlers
   - **API Management**: /api/sitemap/generate and /api/sitemap/status endpoints for sitemap management
+- July 7, 2025. **SEO Content Optimization for Broader Market Coverage:**
+  - **Updated Meta Descriptions**: Changed from ERP-focused to comprehensive technology services coverage
+  - **Expanded Keywords**: Now includes desarrollo software, aplicaciones móviles, desarrollo web, e-commerce, consultoría tecnológica
+  - **Service-Focused Sitemap**: Restructured to prioritize all services (software development, mobile apps, web development, e-commerce)
+  - **Industry Solutions**: Added specific pages for restaurantes, retail, manufactura, servicios sectors
+  - **Technology Solutions**: Included automatización procesos, digitalización empresarial, transformación digital
+  - **Broader Appeal**: Optimized to attract customers looking for any of the technology services offered, not just ERP
+  - **Market Expansion**: SEO now targets wider audience seeking software development, mobile apps, web solutions in Dominican Republic
 - July 7, 2025. **Complete Migration to Replit Environment:**
   - **Successfully migrated comprehensive Dominican Republic ERP system from Replit Agent to standard Replit**
   - **Fixed critical authentication issues:** Created missing login_attempts table, resolved database schema conflicts
