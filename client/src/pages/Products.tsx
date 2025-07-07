@@ -177,20 +177,37 @@ export default function Products() {
 
  const generateImageMutation = useMutation({
   mutationFn: async (data: { productName: string; productCode?: string; description?: string; source?: string; productId?: string }) => {
-    return await apiRequest("/api/products/generate-image", {
+    const response = await apiRequest("/api/products/generate-image", {
       method: "POST",
       body: data
     });
+    return await response.json();
   },
-  onSuccess: (data, variables) => {
+  onSuccess: (data: any, variables) => {
+    console.log("Image generation response:", data);
+    console.log("Response imageUrl:", data?.imageUrl);
+    
     // Siempre actualiza la imagen en el formulario cuando se genera
-    form.setValue("imageUrl", data.imageUrl);
-    setCurrentImageUrl(data.imageUrl);
+    const imageUrl = data?.imageUrl || (data as any)?.imageUrl;
+    if (imageUrl) {
+      form.setValue("imageUrl", imageUrl);
+      setCurrentImageUrl(imageUrl);
+      toast({ 
+        title: "Imagen generada", 
+        description: `Se ha generado la imagen: ${imageUrl}` 
+      });
+    } else {
+      console.error("No imageUrl found in response:", data);
+      toast({ 
+        title: "Error", 
+        description: "La imagen se generó pero no se pudo obtener la URL.", 
+        variant: "destructive" 
+      });
+    }
     
     // Invalida y actualiza la lista
     queryClient.invalidateQueries({ queryKey: ["/api/products"], exact: true });
     queryClient.refetchQueries({ queryKey: ["/api/products"], exact: true });
-    toast({ title: "Imagen generada", description: "Se ha generado la imagen con IA exitosamente." });
   },
   onError: () => {
     toast({ title: "Error", description: "No se pudo generar la imagen.", variant: "destructive" });
@@ -667,9 +684,9 @@ export default function Products() {
       toast({ title: "Error", description: "Ingrese el nombre del producto primero.", variant: "destructive" });
     }
   }}
-  disabled={generateImageMutation.isLoading}
+  disabled={generateImageMutation.isPending}
 >
-  {generateImageMutation.isLoading ? (
+  {generateImageMutation.isPending ? (
     <div className="flex items-center gap-2">
       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
       Generando con IA...
@@ -698,9 +715,9 @@ export default function Products() {
       toast({ title: "Error", description: "Ingrese el nombre del producto primero.", variant: "destructive" });
     }
   }}
-  disabled={generateImageMutation.isLoading}
+  disabled={generateImageMutation.isPending}
 >
-  {generateImageMutation.isLoading ? (
+  {generateImageMutation.isPending ? (
     <div className="flex items-center gap-2">
       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
       Buscando...
