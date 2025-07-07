@@ -120,6 +120,15 @@ app.use((req, res, next) => {
       } catch (error) {
         console.warn("Failed to initialize optimized RNC system:", error);
       }
+
+      // Initialize sitemap and SEO files
+      try {
+        const { sitemapService } = await import("./sitemap-service");
+        await sitemapService.updateSitemapWithDynamicContent();
+        log("Sitemap and robots.txt generated successfully");
+      } catch (error) {
+        console.error("Failed to initialize sitemap:", error);
+      }
       
       // DGII registry updater disabled for memory optimization
       // try {

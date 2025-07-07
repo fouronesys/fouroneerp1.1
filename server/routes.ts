@@ -28,6 +28,7 @@ import { ImageHistoryService } from "./image-history-service";
 import { GeminiImageService } from "./gemini-image-service";
 import { AIChatService, AIBusinessService } from "./ai-services-fixed";
 import { indexNowService } from "./indexnow-service";
+import { sitemapService } from "./sitemap-service";
 import { db } from "./db";
 import { and, eq, isNotNull, desc, sql, inArray, gte } from "drizzle-orm";
 import fs from "fs";
@@ -8277,6 +8278,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve IndexNow key file
   app.get(`/${indexNowService.getKeyFile()}`, (req, res) => {
     res.type('text/plain').send(indexNowService.getApiKey());
+  });
+
+  // Sitemap endpoints (these need to be registered early to override static files)
+  app.get("/sitemap.xml", (req, res) => {
+    try {
+      const sitemapContent = sitemapService.getSitemapContent();
+      res.setHeader('Content-Type', 'application/xml');
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+      res.send(sitemapContent);
+    } catch (error) {
+      console.error("Error serving sitemap:", error);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
+  app.get("/robots.txt", (req, res) => {
+    try {
+      const robotsContent = sitemapService.generateRobotsTxt();
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+      res.send(robotsContent);
+    } catch (error) {
+      console.error("Error serving robots.txt:", error);
+      res.status(500).send("Error generating robots.txt");
+    }
+  });
+
+  // Sitemap management API endpoints
+  app.post("/api/sitemap/generate", simpleAuth, async (req: any, res) => {
+    try {
+      await sitemapService.updateSitemapWithDynamicContent();
+      res.json({ 
+        message: "Sitemap and robots.txt generated successfully",
+        generated: true
+      });
+    } catch (error) {
+      console.error("Error generating sitemap:", error);
+      res.status(500).json({ message: "Failed to generate sitemap" });
+    }
+  });
+
+  app.get("/api/sitemap/status", simpleAuth, async (req: any, res) => {
+    try {
+      res.json({
+        sitemapUrl: "/sitemap.xml",
+        robotsUrl: "/robots.txt",
+        status: "active",
+        lastGenerated: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error getting sitemap status:", error);
+      res.status(500).json({ message: "Failed to get sitemap status" });
+    }
   });
 
   const httpServer = createServer(app);
