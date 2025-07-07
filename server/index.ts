@@ -87,6 +87,9 @@ app.use((req, res, next) => {
 
     const server = await registerRoutes(app);
 
+    // Serve uploads directory statically
+    app.use('/uploads', express.static('uploads'));
+
     // Global error handler middleware
     app.use(errorHandlerMiddleware);
 
