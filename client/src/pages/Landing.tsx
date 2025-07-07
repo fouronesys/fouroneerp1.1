@@ -134,29 +134,29 @@ export default function Landing() {
   ];
 
   const stats = [
-    { icon: Users, number: "500+", label: "Clientes Satisfechos" },
-    { icon: CheckCircle2, number: "1000+", label: "Proyectos Completados" },
-    { icon: Award, number: "15+", label: "Años de Experiencia" },
-    { icon: TrendingUp, number: "99%", label: "Tasa de Éxito" }
+    { icon: Users, number: "24/7", label: "Soporte Técnico" },
+    { icon: CheckCircle2, number: "100%", label: "Código Propio" },
+    { icon: Award, number: "RD", label: "Empresa Local" },
+    { icon: TrendingUp, number: "DGII", label: "Cumplimiento Fiscal" }
   ];
 
   const testimonials = [
     {
-      name: "María González",
-      company: "Supermercados González",
-      content: "El sistema ERP de Four One Solutions transformó completamente nuestra gestión. Ahora tenemos control total sobre inventarios y finanzas.",
+      name: "Sistema Demo",
+      company: "Prueba nuestras funcionalidades",
+      content: "Explora todas las características del sistema ERP con datos de demostración. Prueba la gestión de inventarios, facturación NCF y reportes DGII.",
       rating: 5
     },
     {
-      name: "Carlos Méndez",
-      company: "Restaurante El Sabor",
-      content: "El sistema POS es increíble. La integración con impresoras térmicas y la generación automática de NCF nos ahorra horas diarias.",
+      name: "Tecnología Moderna",
+      company: "Stack tecnológico actualizado",
+      content: "React, TypeScript, PostgreSQL y Node.js. Sistema desarrollado con tecnologías modernas y estándares de desarrollo actuales.",
       rating: 5
     },
     {
-      name: "Ana Rodríguez",
-      company: "Farmacia Central",
-      content: "La app móvil para control de inventarios es perfecta. Podemos gestionar todo desde cualquier lugar de manera profesional.",
+      name: "Cumplimiento Fiscal",
+      company: "Normativas dominicanas",
+      content: "Sistema diseñado específicamente para cumplir con todas las regulaciones fiscales de República Dominicana incluyendo NCF y reportes DGII.",
       rating: 5
     }
   ];
@@ -164,8 +164,8 @@ export default function Landing() {
   return (
     <>
       <SEOHead 
-        title="Four One Solutions - Líder en Desarrollo de Software ERP en República Dominicana | Moca"
-        description="🏆 #1 en desarrollo de software empresarial en República Dominicana. Sistemas ERP, facturación NCF DGII, apps móviles, e-commerce. Ubicados en Moca. ✅ Cumplimiento fiscal dominicano. ☎️ (829) 351-9324"
+        title="Four One Solutions - Desarrollo de Software ERP en República Dominicana | Moca"
+        description="Desarrollo de software empresarial en República Dominicana. Sistemas ERP, facturación NCF DGII, apps móviles, e-commerce. Ubicados en Moca. ✅ Cumplimiento fiscal dominicano. ☎️ (829) 351-9324"
         keywords="desarrollo software república dominicana, sistema ERP dominicana, facturación NCF DGII, Four One Solutions Moca, software empresarial dominicano, aplicaciones móviles RD, e-commerce dominicana, consultoría tecnológica santiago, POS system dominicana, inventario empresarial, contabilidad automatizada dominicana, transformación digital empresas"
       />
       
@@ -363,7 +363,7 @@ export default function Landing() {
                   transition={{ duration: 2, repeat: Infinity }}
                 >
                   <Sparkles className="w-4 h-4 text-blue-400" />
-                  <span className="text-sm text-blue-300 font-medium">Líder en Soluciones Tecnológicas</span>
+                  <span className="text-sm text-blue-300 font-medium">Soluciones Tecnológicas Empresariales</span>
                 </motion.div>
                 
                 <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
@@ -537,8 +537,8 @@ export default function Landing() {
                     ¿Por qué elegir <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Four One Solutions</span>?
                   </h2>
                   <p className="text-lg text-gray-300 mb-6">
-                    Somos una empresa dominicana con más de 15 años de experiencia en el desarrollo de soluciones tecnológicas. 
-                    Nos especializamos en crear sistemas que realmente resuelven los desafíos específicos de las empresas locales.
+                    Empresa dominicana especializada en desarrollo de soluciones tecnológicas empresariales. 
+                    Nos enfocamos en crear sistemas que cumplen con las normativas locales y resuelven necesidades específicas del mercado dominicano.
                   </p>
                   <div className="space-y-4">
                     <div className="flex items-center">
@@ -547,7 +547,7 @@ export default function Landing() {
                     </div>
                     <div className="flex items-center">
                       <CheckCircle2 className="w-5 h-5 text-green-400 mr-3" />
-                      <span className="text-gray-300">Soporte técnico local en español 24/7</span>
+                      <span className="text-gray-300">Soporte técnico local en español</span>
                     </div>
                     <div className="flex items-center">
                       <CheckCircle2 className="w-5 h-5 text-green-400 mr-3" />
@@ -591,8 +591,8 @@ export default function Landing() {
                   <Card className="bg-gradient-to-br from-orange-600/20 to-red-600/20 border-orange-500/30">
                     <CardContent className="p-6 text-center">
                       <TrendingUp className="w-8 h-8 text-orange-400 mx-auto mb-3" />
-                      <div className="text-2xl font-bold text-white mb-1">300%</div>
-                      <div className="text-sm text-gray-300">ROI Promedio</div>
+                      <div className="text-2xl font-bold text-white mb-1">NCF</div>
+                      <div className="text-sm text-gray-300">Integrado</div>
                     </CardContent>
                   </Card>
                 </motion.div>
