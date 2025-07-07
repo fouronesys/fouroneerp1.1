@@ -2854,6 +2854,24 @@ export class DatabaseStorage implements IStorage {
 
 
 
+  async createRNCRecord(rncData: any): Promise<any> {
+    try {
+      const [result] = await db.insert(rncRegistry).values({
+        rnc: rncData.rnc,
+        razonSocial: rncData.razonSocial,
+        nombreComercial: rncData.nombreComercial,
+        categoria: rncData.categoria,
+        regimen: rncData.regimen,
+        estado: rncData.estado,
+        lastUpdated: new Date()
+      }).returning();
+      return result;
+    } catch (error) {
+      console.error('Error creating RNC record:', error);
+      throw error;
+    }
+  }
+
   async clearRNCRegistry(): Promise<void> {
     await db.delete(rncRegistry);
     console.log('RNC registry cleared');

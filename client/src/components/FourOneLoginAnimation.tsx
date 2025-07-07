@@ -29,9 +29,9 @@ export default function FourOneLoginAnimation({ isVisible, onComplete }: FourOne
         setShowLogo(true);
         setTimeout(() => {
           onComplete?.();
-        }, 3000);
+        }, 1500);
       }
-    }, 600);
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [currentStep, isVisible, showLogo, onComplete, fourOnes.length]);
@@ -75,10 +75,10 @@ export default function FourOneLoginAnimation({ isVisible, onComplete }: FourOne
               opacity: [0, 0.8, 0]
             }}
             transition={{
-              duration: Math.random() * 3 + 4,
+              duration: Math.random() * 2 + 3,
               repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "linear"
+              delay: Math.random() * 1,
+              ease: "easeOut"
             }}
           />
         ))}
@@ -102,9 +102,9 @@ export default function FourOneLoginAnimation({ isVisible, onComplete }: FourOne
                   rotate: isActive ? [0, 10, -10, 0] : 0
                 }}
                 transition={{
-                  duration: 0.5,
-                  delay: index * 0.2,
-                  rotate: { delay: index * 0.2 + 0.3, duration: 0.4 }
+                  duration: 0.4,
+                  delay: index * 0.15,
+                  rotate: { delay: index * 0.15 + 0.2, duration: 0.3 }
                 }}
                 className="flex flex-col items-center"
               >

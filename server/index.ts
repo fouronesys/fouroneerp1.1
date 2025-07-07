@@ -118,13 +118,14 @@ app.use((req, res, next) => {
         console.warn("Failed to initialize optimized RNC system:", error);
       }
       
-      // Start the DGII registry auto-updater (only after successful DB connection)
-      try {
-        dgiiRegistryUpdater.startAutoUpdate();
-        log("DGII RNC registry system initialized with auto-update enabled");
-      } catch (error) {
-        console.warn("DGII registry updater failed to start:", error);
-      }
+      // DGII registry updater disabled for memory optimization
+      // try {
+      //   dgiiRegistryUpdater.startAutoUpdate();
+      //   log("DGII RNC registry system initialized with auto-update enabled");
+      // } catch (error) {
+      //   console.warn("DGII registry updater failed to start:", error);
+      // }
+      log("DGII RNC registry system disabled for memory optimization");
       
       // Start DGII server monitoring
       try {
