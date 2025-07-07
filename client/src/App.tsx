@@ -78,6 +78,7 @@ import Reports from "@/pages/Reports";
 import Permissions from "@/pages/Permissions";
 import System from "@/pages/System";
 import Downloads from "@/pages/Downloads";
+import Sitemap from "@/pages/Sitemap";
 import Security from "@/pages/Security";
 
 import InstallationGuide from "@/pages/InstallationGuide";
@@ -340,6 +341,7 @@ function Router() {
           <Route path="/permissions" component={Permissions} />
           <Route path="/system" component={System} />
             <Route path="/downloads" component={Downloads} />
+            <Route path="/sitemap" component={Sitemap} />
           <Route path="/security" component={Security} />
           <Route path="/reset-password/:token" component={ResetPassword} />
           <Route path="/help/installation" component={InstallationGuide} />

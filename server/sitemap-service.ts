@@ -60,6 +60,7 @@ export class SitemapService {
       
       // Resources and downloads
       { loc: '/downloads', priority: '0.8', changefreq: 'weekly' },
+      { loc: '/sitemap', priority: '0.6', changefreq: 'monthly' },
       { loc: '/recursos/documentacion', priority: '0.6', changefreq: 'monthly' },
       { loc: '/recursos/casos-estudio', priority: '0.7', changefreq: 'weekly' },
       

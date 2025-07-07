@@ -303,6 +303,13 @@ export default function Landing() {
                   >
                     Contacto
                   </Button>
+                  <Button 
+                    variant="ghost"
+                    onClick={() => window.location.href = "/sitemap"}
+                    className="text-gray-300 hover:text-white hover:bg-gray-800"
+                  >
+                    Sitemap
+                  </Button>
                 </div>
                 
                 <div className="hidden sm:block">

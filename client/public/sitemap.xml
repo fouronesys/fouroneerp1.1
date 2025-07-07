@@ -145,6 +145,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://fourone.com.do/sitemap</loc>
+    <lastmod>2025-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://fourone.com.do/recursos/documentacion</loc>
     <lastmod>2025-07-07</lastmod>
     <changefreq>monthly</changefreq>
