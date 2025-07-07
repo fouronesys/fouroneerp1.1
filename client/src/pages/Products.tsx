@@ -190,7 +190,8 @@ export default function Products() {
     }
     // Invalida y actualiza la lista
     queryClient.invalidateQueries({ queryKey: ["/api/products"], exact: true });
-    toast({ title: "Imagen generada", description: "Se ha generado la imagen automáticamente." });
+    queryClient.refetchQueries({ queryKey: ["/api/products"], exact: true });
+    toast({ title: "Imagen generada", description: "Se ha generado la imagen con IA exitosamente." });
   },
   onError: () => {
     toast({ title: "Error", description: "No se pudo generar la imagen.", variant: "destructive" });
@@ -660,7 +661,8 @@ export default function Products() {
         productName,
         productCode: productCode || undefined,
         description: description || undefined,
-        source: "manual"
+        source: "manual",
+        productId: editingProduct?.id?.toString()
       });
     } else {
       toast({ title: "Error", description: "Ingrese el nombre del producto primero.", variant: "destructive" });
@@ -690,7 +692,8 @@ export default function Products() {
         productName,
         productCode: productCode || undefined,
         description: description || undefined,
-        source: "unsplash"
+        source: "unsplash",
+        productId: editingProduct?.id?.toString()
       });
     } else {
       toast({ title: "Error", description: "Ingrese el nombre del producto primero.", variant: "destructive" });

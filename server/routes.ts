@@ -7904,8 +7904,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Image generation endpoints
   app.post("/api/products/generate-image", simpleAuth, async (req: any, res) => {
     try {
-      const { productName, productCode, description, source } = req.body;
+      const { productName, productCode, description, source, productId } = req.body;
       const userId = req.user.id;
+      const companyId = req.user.companyId || 1;
       
       if (!productName) {
         return res.status(400).json({ message: "Product name is required" });
@@ -7918,16 +7919,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (imageResult) {
         const { url: imageUrl, source: imageSource } = imageResult;
+        
+        // If productId is provided, update the product with the generated image
+        if (productId) {
+          try {
+            await storage.updateProduct(parseInt(productId), { imageUrl }, companyId);
+          } catch (updateError) {
+            console.error("Error updating product with image:", updateError);
+          }
+        }
         // Record successful generation
         await ImageHistoryService.recordGeneration({
-          productId: 0, // No specific product ID for manual generation
+          productId: productId ? parseInt(productId) : 0,
           productName,
           imageUrl,
           source: imageSource,
           prompt: `Generate image for: ${productName}${category ? ` in ${category}` : ''}${description ? `. ${description}` : ''}`,
           generatedAt: new Date(),
           userId,
-          companyId: req.user.companyId || 1,
+          companyId,
           success: true
         });
         
@@ -7960,7 +7970,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           prompt: `Generate image for: ${productName}`,
           generatedAt: new Date(),
           userId,
-          companyId: req.user.companyId || 1,
+          companyId,
           success: false,
           errorMessage: "No se pudo generar una imagen para este producto"
         });
