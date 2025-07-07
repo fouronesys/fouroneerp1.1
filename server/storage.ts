@@ -346,6 +346,7 @@ export interface IStorage {
   bulkCreateRNCRegistry(records: InsertRNCRegistry[]): Promise<{ inserted: number; skipped: number }>;
   getRNCRegistryCount(): Promise<number>;
   clearRNCRegistry(): Promise<void>;
+  deleteRNCRecordsChunk(chunkSize: number): Promise<{ deleted: number }>;
 
   // Exchange Rate operations for Multi-Currency
   getExchangeRate(currency: string): Promise<ExchangeRate | undefined>;
@@ -2856,6 +2857,28 @@ export class DatabaseStorage implements IStorage {
   async clearRNCRegistry(): Promise<void> {
     await db.delete(rncRegistry);
     console.log('RNC registry cleared');
+  }
+
+  async deleteRNCRecordsChunk(chunkSize: number): Promise<{ deleted: number }> {
+    try {
+      // Get records to delete in chunks
+      const recordsToDelete = await db.select({ id: rncRegistry.id })
+        .from(rncRegistry)
+        .limit(chunkSize);
+
+      if (recordsToDelete.length === 0) {
+        return { deleted: 0 };
+      }
+
+      // Delete the records by their IDs
+      const ids = recordsToDelete.map(r => r.id);
+      await db.delete(rncRegistry).where(sql`${rncRegistry.id} IN (${sql.join(ids, sql`, `)})`);
+
+      return { deleted: recordsToDelete.length };
+    } catch (error) {
+      console.error('Error deleting RNC records chunk:', error);
+      throw error;
+    }
   }
 
   // Purchases Module Implementation

@@ -7,7 +7,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { 
   Check, Shield, Star, Code, Smartphone, 
   Mail, Phone, MapPin, Send, ArrowRight,
-  Instagram,  Github,
+  Instagram, Github,
   Users, Building, PieChart, 
   ShoppingCart,
   HeadphonesIcon, Cloud,
@@ -814,9 +814,9 @@ export default function Landing() {
                           </a>
                         </div>
                       </div>
-                      </div>
                     </div>
                   </div>
+                </motion.div>
 
                   <div>
                     <h4 className="text-lg font-semibold text-white mb-4">Síguenos</h4>
@@ -846,9 +846,8 @@ export default function Landing() {
                       </motion.div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               </div>
-            </div>
           </section>
 
           {/* Footer */}
