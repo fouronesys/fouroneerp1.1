@@ -504,7 +504,7 @@ ${contactData.message}
 
 Acciones sugeridas:
 - Responder al email: ${contactData.email}
-${contactData.phone ? `- Llamar al teléfono: +1 (829) ${contactData.phone}` : ''}
+${contactData.phone ? `- Llamar al teléfono: +1${contactData.phone}` : ''}
 - Registrar en el CRM para seguimiento
 
 Este mensaje fue enviado desde el formulario de contacto del sitio web.
