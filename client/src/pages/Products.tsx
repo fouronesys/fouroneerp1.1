@@ -176,7 +176,7 @@ export default function Products() {
   });
 
  const generateImageMutation = useMutation({
-  mutationFn: async (data: { productName: string; productCode?: string; description?: string; source?: string; productId?: string }) => {
+  mutationFn: async (data: { productName: string; productCode?: string; description?: string; source?: string; productId?: string; previousImageUrl?: string }) => {
     const response = await apiRequest("/api/products/generate-image", {
       method: "POST",
       body: data
@@ -663,70 +663,46 @@ export default function Products() {
                       )}
                     />
                     
-                    {/* Image Generation Buttons - Cambios aplicados */}
-                    <div className="grid grid-cols-2 gap-2">
-<Button
-  type="button"
-  variant="outline"
-  onClick={() => {
-    const productName = form.getValues("name");
-    const productCode = form.getValues("code");
-    const description = form.getValues("description");
-    if (productName) {
-      generateImageMutation.mutate({
-        productName,
-        productCode: productCode || undefined,
-        description: description || undefined,
-        source: "manual",
-        productId: editingProduct?.id?.toString()
-      });
-    } else {
-      toast({ title: "Error", description: "Ingrese el nombre del producto primero.", variant: "destructive" });
-    }
-  }}
-  disabled={generateImageMutation.isPending}
->
-  {generateImageMutation.isPending ? (
-    <div className="flex items-center gap-2">
-      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-      Generando con IA...
-    </div>
-  ) : (
-    "Generar con Gemini AI"
-  )}
-</Button>
-                      
-                   <Button
-  type="button"
-  variant="outline"
-  onClick={() => {
-    const productName = form.getValues("name");
-    const productCode = form.getValues("code");
-    const description = form.getValues("description");
-    if (productName) {
-      generateImageMutation.mutate({
-        productName,
-        productCode: productCode || undefined,
-        description: description || undefined,
-        source: "unsplash",
-        productId: editingProduct?.id?.toString()
-      });
-    } else {
-      toast({ title: "Error", description: "Ingrese el nombre del producto primero.", variant: "destructive" });
-    }
-  }}
-  disabled={generateImageMutation.isPending}
->
-  {generateImageMutation.isPending ? (
-    <div className="flex items-center gap-2">
-      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-      Buscando...
-    </div>
-  ) : (
-    "Buscar en Unsplash"
-  )}
-</Button>
-                    </div>
+                    {/* Botón de Generación con IA */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        const productName = form.getValues("name");
+                        const productCode = form.getValues("code");
+                        const description = form.getValues("description");
+                        const currentImageUrl = form.getValues("imageUrl");
+                        
+                        if (productName) {
+                          generateImageMutation.mutate({
+                            productName,
+                            productCode: productCode || undefined,
+                            description: description || undefined,
+                            source: "gemini",
+                            productId: editingProduct?.id?.toString(),
+                            previousImageUrl: currentImageUrl || undefined
+                          });
+                        } else {
+                          toast({ title: "Error", description: "Ingrese el nombre del producto primero.", variant: "destructive" });
+                        }
+                      }}
+                      disabled={generateImageMutation.isPending}
+                      className="w-full"
+                    >
+                      {generateImageMutation.isPending ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                          Generando con IA...
+                        </div>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                          </svg>
+                          Generar con Gemini AI
+                        </>
+                      )}
+                    </Button>
                   </div>
 
                   <FormField
@@ -973,7 +949,8 @@ export default function Products() {
       productCode: product.code,
       description: product.description || "",
       source: "single",
-      productId: product.id
+      productId: product.id.toString(),
+      previousImageUrl: product.imageUrl || undefined
     });
   }}
   className="text-purple-600 hover:text-purple-700"

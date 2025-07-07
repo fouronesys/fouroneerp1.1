@@ -73,6 +73,8 @@ interface ImageGenerationStats {
 }
 
 function ImageHistoryContent() {
+  const { toast } = useToast();
+  
   const { data: history, isLoading: historyLoading } = useQuery<ImageHistoryRecord[]>({
     queryKey: ['/api/image-generation/history'],
     refetchInterval: 30000 // Refresh every 30 seconds
@@ -80,6 +82,34 @@ function ImageHistoryContent() {
 
   const { data: stats, isLoading: statsLoading } = useQuery<ImageGenerationStats>({
     queryKey: ['/api/image-generation/statistics']
+  });
+
+  const { data: storageStats, isLoading: storageLoading } = useQuery({
+    queryKey: ['/api/images/stats'],
+    refetchInterval: 60000 // Refresh every minute
+  });
+
+  const cleanupImagesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("/api/images/cleanup", {
+        method: "POST"
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Limpieza completada",
+        description: `${data.message}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/images/stats'] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo completar la limpieza de imágenes",
+        variant: "destructive",
+      });
+    }
   });
 
   const getSourceIcon = (source: string) => {
@@ -176,6 +206,59 @@ function ImageHistoryContent() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Storage Management */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Gestión de Almacenamiento</CardTitle>
+              <CardDescription>
+                Administra el espacio de almacenamiento de imágenes
+              </CardDescription>
+            </div>
+            <Button 
+              onClick={() => cleanupImagesMutation.mutate()}
+              disabled={cleanupImagesMutation.isPending}
+              variant="outline"
+            >
+              {cleanupImagesMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Limpiando...
+                </>
+              ) : (
+                <>
+                  <HardDrive className="mr-2 h-4 w-4" />
+                  Limpiar Imágenes Antiguas
+                </>
+              )}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Archivos Totales</Label>
+              <div className="text-2xl font-bold">
+                {storageLoading ? '...' : (storageStats?.totalFiles || 0)}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Espacio Utilizado</Label>
+              <div className="text-2xl font-bold">
+                {storageLoading ? '...' : `${storageStats?.totalSizeMB || 0} MB`}
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 p-4 bg-muted rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <AlertCircle className="h-4 w-4" />
+              La limpieza elimina imágenes de más de 7 días no referenciadas por productos activos
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* History Table */}
       <Card>

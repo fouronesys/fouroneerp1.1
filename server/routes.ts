@@ -25,6 +25,7 @@ import { CedulaValidationService } from "./cedula-validation-service";
 import { AccountingService } from "./accounting-service";
 import { ImageGenerationService } from "./image-generation-service";
 import { ImageHistoryService } from "./image-history-service";
+import { GeminiImageService } from "./gemini-image-service";
 import { AIChatService, AIBusinessService } from "./ai-services-fixed";
 import { db } from "./db";
 import { and, eq, isNotNull, desc, sql, inArray, gte } from "drizzle-orm";
@@ -7908,7 +7909,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Image generation endpoints
   app.post("/api/products/generate-image", simpleAuth, async (req: any, res) => {
     try {
-      const { productName, productCode, description, source, productId } = req.body;
+      const { productName, productCode, description, source, productId, previousImageUrl } = req.body;
       const userId = req.user.id;
       const companyId = req.user.companyId || 1;
       
@@ -7916,13 +7917,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Product name is required" });
       }
 
-      // Extract category from product name or description for better image search
-      const category = description ? description.split(' ').slice(0, 2).join(' ') : undefined;
-      
-      const imageResult = await ImageGenerationService.generateProductImage(productName, category, description);
+      // Only use Gemini AI for generation (remove Unsplash/other sources)
+      const imageResult = await GeminiImageService.generateProductImage(productName, description || undefined, description);
       
       if (imageResult) {
-        const { url: imageUrl, source: imageSource } = imageResult;
+        // Delete previous image if it exists
+        if (previousImageUrl && previousImageUrl.startsWith('/uploads/')) {
+          try {
+            const { ImageCleanupService } = await import('./image-cleanup-service');
+            await ImageCleanupService.deleteImageFile(previousImageUrl);
+          } catch (cleanupError) {
+            console.error("Error deleting previous image:", cleanupError);
+          }
+        }
+
+        const imageUrl = imageResult;
+        const imageSource = 'gemini';
         
         // If productId is provided, update the product with the generated image
         if (productId) {
@@ -7932,13 +7942,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.error("Error updating product with image:", updateError);
           }
         }
+
+        // Force garbage collection to optimize memory
+        if (global.gc) {
+          global.gc();
+        }
         // Record successful generation
         await ImageHistoryService.recordGeneration({
           productId: productId ? parseInt(productId) : 0,
           productName,
           imageUrl,
           source: imageSource,
-          prompt: `Generate image for: ${productName}${category ? ` in ${category}` : ''}${description ? `. ${description}` : ''}`,
+          prompt: `Generate image for: ${productName}${description ? `. ${description}` : ''}`,
           generatedAt: new Date(),
           userId,
           companyId,
@@ -8159,6 +8174,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching products without images:", error);
       res.status(500).json({ message: "Failed to fetch products without images" });
+    }
+  });
+
+  // Image cleanup endpoint
+  app.post("/api/images/cleanup", simpleAuth, async (req: any, res) => {
+    try {
+      const { ImageCleanupService } = await import('./image-cleanup-service');
+      const result = await ImageCleanupService.cleanupOrphanedImages();
+      
+      // Force garbage collection after cleanup
+      ImageCleanupService.forceGarbageCollection();
+      
+      res.json({ 
+        success: true, 
+        message: `Cleanup completed. Deleted ${result.deleted} files.`,
+        ...result 
+      });
+    } catch (error) {
+      console.error("Error during image cleanup:", error);
+      res.status(500).json({ message: "Failed to cleanup images" });
+    }
+  });
+
+  // Storage statistics endpoint
+  app.get("/api/images/stats", simpleAuth, async (req: any, res) => {
+    try {
+      const { ImageCleanupService } = await import('./image-cleanup-service');
+      const stats = await ImageCleanupService.getStorageStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting storage stats:", error);
+      res.status(500).json({ message: "Failed to get storage statistics" });
     }
   });
 
