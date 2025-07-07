@@ -27,6 +27,7 @@ import { ImageGenerationService } from "./image-generation-service";
 import { ImageHistoryService } from "./image-history-service";
 import { GeminiImageService } from "./gemini-image-service";
 import { AIChatService, AIBusinessService } from "./ai-services-fixed";
+import { indexNowService } from "./indexnow-service";
 import { db } from "./db";
 import { and, eq, isNotNull, desc, sql, inArray, gte } from "drizzle-orm";
 import fs from "fs";
@@ -8207,6 +8208,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error getting storage stats:", error);
       res.status(500).json({ message: "Failed to get storage statistics" });
     }
+  });
+
+  // IndexNow API endpoints for Bing search engine integration
+  app.get("/api/indexnow/status", simpleAuth, async (req: any, res) => {
+    try {
+      res.json({
+        apiKey: indexNowService.getApiKey(),
+        keyFile: indexNowService.getKeyFile(),
+        status: "active",
+        service: "Bing IndexNow"
+      });
+    } catch (error) {
+      console.error("Error getting IndexNow status:", error);
+      res.status(500).json({ message: "Failed to get IndexNow status" });
+    }
+  });
+
+  app.post("/api/indexnow/submit", simpleAuth, async (req: any, res) => {
+    try {
+      const { urls } = req.body;
+      
+      if (!urls || !Array.isArray(urls)) {
+        return res.status(400).json({ message: "URLs array is required" });
+      }
+
+      const success = await indexNowService.submitUrls(urls);
+      
+      if (success) {
+        res.json({ 
+          message: `Successfully submitted ${urls.length} URLs to Bing IndexNow`,
+          urls: urls,
+          submitted: true
+        });
+      } else {
+        res.status(500).json({ 
+          message: "Failed to submit URLs to IndexNow",
+          submitted: false
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting URLs to IndexNow:", error);
+      res.status(500).json({ message: "Failed to submit URLs to IndexNow" });
+    }
+  });
+
+  app.post("/api/indexnow/submit-modules", simpleAuth, async (req: any, res) => {
+    try {
+      const success = await indexNowService.submitAllModules();
+      
+      if (success) {
+        res.json({ 
+          message: "Successfully submitted all ERP modules to Bing IndexNow",
+          submitted: true
+        });
+      } else {
+        res.status(500).json({ 
+          message: "Failed to submit modules to IndexNow",
+          submitted: false
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting modules to IndexNow:", error);
+      res.status(500).json({ message: "Failed to submit modules to IndexNow" });
+    }
+  });
+
+  // Serve IndexNow key file
+  app.get(`/${indexNowService.getKeyFile()}`, (req, res) => {
+    res.type('text/plain').send(indexNowService.getApiKey());
   });
 
   const httpServer = createServer(app);
