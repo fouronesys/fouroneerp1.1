@@ -45,9 +45,48 @@ export class ImageGenerationService {
         return { url: googleImage, source: 'google' };
       }
 
+      // Ultimate fallback: Generate a placeholder image URL with product info
+      const placeholderImage = await this.generatePlaceholderImage(productName, description);
+      if (placeholderImage) {
+        return { url: placeholderImage, source: 'unsplash' };
+      }
+
       return null;
     } catch (error) {
       console.error('Error generating product image:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Generate a placeholder image URL for testing when APIs are not available
+   */
+  static async generatePlaceholderImage(productName: string, description?: string): Promise<string | null> {
+    try {
+      // Create placeholder URLs based on product type
+      const placeholderUrls = {
+        laptop: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800",
+        monitor: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
+        teclado: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800", 
+        mouse: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800",
+        smartphone: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800",
+        auriculares: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800",
+        default: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800"
+      };
+
+      const productLower = productName.toLowerCase();
+      
+      // Determine product type and return appropriate placeholder
+      if (productLower.includes('laptop')) return placeholderUrls.laptop;
+      if (productLower.includes('monitor')) return placeholderUrls.monitor;
+      if (productLower.includes('teclado')) return placeholderUrls.teclado;
+      if (productLower.includes('mouse')) return placeholderUrls.mouse;
+      if (productLower.includes('smartphone') || productLower.includes('teléfono')) return placeholderUrls.smartphone;
+      if (productLower.includes('auriculares') || productLower.includes('headphone')) return placeholderUrls.auriculares;
+      
+      return placeholderUrls.default;
+    } catch (error) {
+      console.error('Error generating placeholder image:', error);
       return null;
     }
   }
