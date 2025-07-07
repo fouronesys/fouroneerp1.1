@@ -64,6 +64,17 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Login attempts table for security
+export const loginAttempts = pgTable("login_attempts", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  ipAddress: varchar("ip_address", { length: 45 }).notNull(),
+  userAgent: text("user_agent"),
+  success: boolean("success").notNull(),
+  failureReason: text("failure_reason"),
+  attemptedAt: timestamp("attempted_at").defaultNow(),
+});
+
 // Company Users - Junction table for user-company relationships
 export const companyUsers = pgTable("company_users", {
   id: serial("id").primaryKey(),

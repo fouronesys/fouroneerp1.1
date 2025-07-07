@@ -42,11 +42,9 @@ export default function FourOneLoginAnimation({ isVisible, onComplete }: FourOne
     <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-black to-slate-900 flex items-center justify-center z-50 overflow-hidden">
       {/* Animated Background Particles */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-500 rounded-full blur-3xl animate-pulse opacity-30"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-purple-500 rounded-full blur-2xl animate-pulse delay-1000 opacity-25"></div>
-        <div className="absolute top-1/2 right-1/3 w-20 h-20 bg-indigo-500 rounded-full blur-xl animate-pulse delay-500 opacity-20"></div>
-        <div className="absolute top-3/4 left-1/3 w-16 h-16 bg-cyan-400 rounded-full blur-lg animate-pulse delay-700 opacity-15"></div>
-        <div className="absolute top-1/6 right-1/2 w-28 h-28 bg-violet-500 rounded-full blur-2xl animate-pulse delay-300 opacity-25"></div>
+        <div className="absolute top-1/4 left-1/4 w-24 h-24 bg-blue-500 rounded-full blur-2xl animate-pulse opacity-20"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-20 h-20 bg-purple-500 rounded-full blur-xl animate-pulse delay-1000 opacity-15"></div>
+        <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-indigo-500 rounded-full blur-lg animate-pulse delay-500 opacity-10"></div>
       </div>
 
       {/* Geometric Background Pattern */}
@@ -60,7 +58,7 @@ export default function FourOneLoginAnimation({ isVisible, onComplete }: FourOne
 
       {/* Floating Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(12)].map((_, i) => (
+        {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-white rounded-full opacity-60"
