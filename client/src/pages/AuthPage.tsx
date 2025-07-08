@@ -14,7 +14,8 @@ import { Eye, EyeOff, Building, Lock, Mail, User, Search, Check, AlertCircle } f
 import { Badge } from "@/components/ui/badge";
 
 import fourOneLogo from "@assets/Four One Solutions Logo.png";
-import { useLocation } from "wouter";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ROUTES } from "@/config/routes";
 import FourOneLoginAnimation from "@/components/FourOneLoginAnimation";
 
 const loginSchema = z.object({
@@ -75,14 +76,29 @@ export default function AuthPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [location, setLocation] = useLocation();
+ const navigate = useNavigate();
+ const location = useLocation();
 
   // Automatically switch to register tab if accessing via /register route
   useEffect(() => {
-    if (location === "/register") {
-      setActiveTab("register");
-    }
-  }, [location]);
+  if (location.pathname === ROUTES.REGISTER) {
+    setActiveTab("register");
+  } else if (location.pathname === ROUTES.FORGOT_PASSWORD) {
+    setActiveTab("forgot-password");
+  }
+}, [location]);
+
+  const handleTabChange = (tab: string) => {
+  setActiveTab(tab);
+  navigate(
+    tab === "login" 
+      ? ROUTES.LOGIN 
+      : tab === "register" 
+        ? ROUTES.REGISTER 
+        : ROUTES.FORGOT_PASSWORD,
+    { replace: true }
+  );
+};
 
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -291,7 +307,7 @@ export default function AuthPage() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/payment";
+          navigate(ROUTES.PAYMENT);
         }, 2000);
       } else {
         // Parse the error message if it contains status codes
@@ -360,7 +376,7 @@ export default function AuthPage() {
         description: "Ahora debes completar tu pago para activar tu cuenta.",
       });
       // Redirect to setup page for trial users
-      setLocation("/setup");
+      navigate(ROUTES.SETUP, { replace: true });
     },
     onError: (error: any) => {
       console.error('Registration error:', error); // Debug log
@@ -421,7 +437,7 @@ export default function AuthPage() {
   const handleAnimationComplete = () => {
     setShowLoginAnimation(false);
     // Redirect to dashboard after successful login
-    window.location.replace("/");
+    navigate(ROUTES.DASHBOARD, { replace: true });
   };
 
   return (
@@ -534,7 +550,7 @@ export default function AuthPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <Tabs value={activeTab} onValueChange={handleTabChange}>
                   <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600">
                     <TabsTrigger value="login" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700 dark:text-gray-300">Iniciar Sesión</TabsTrigger>
                     <TabsTrigger value="register" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700 dark:text-gray-300">Registrarse</TabsTrigger>
