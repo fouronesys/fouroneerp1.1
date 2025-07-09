@@ -315,8 +315,13 @@ export function setupAuth(app: Express) {
 
         req.login(user, (err) => {
           if (err) {
+            console.error("Login error:", err);
             return res.status(500).json({ message: "Internal server error" });
           }
+          
+          console.log("[DEBUG] Login successful - Session ID:", req.sessionID);
+          console.log("[DEBUG] Login successful - User:", user.id);
+          console.log("[DEBUG] Login successful - isAuthenticated():", req.isAuthenticated());
           
           // Store userId in session for better compatibility
           (req.session as any).userId = user.id;
@@ -324,6 +329,8 @@ export function setupAuth(app: Express) {
             if (saveErr) {
               console.error("Session save error:", saveErr);
             }
+            
+            console.log("[DEBUG] Session saved - Session data:", req.session);
             
             res.json({
               id: user.id,
@@ -398,6 +405,11 @@ export function setupAuth(app: Express) {
 
   // Get current user endpoint
   app.get("/api/user", (req, res) => {
+    console.log("[DEBUG] /api/user - Session ID:", req.sessionID);
+    console.log("[DEBUG] /api/user - Session data:", req.session);
+    console.log("[DEBUG] /api/user - isAuthenticated():", req.isAuthenticated());
+    console.log("[DEBUG] /api/user - req.user:", req.user);
+    
     if (!req.isAuthenticated() || !req.user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
