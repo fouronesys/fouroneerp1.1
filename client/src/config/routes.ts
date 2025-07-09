@@ -1,0 +1,35 @@
+export const ROUTES = {
+  HOME: "/",
+  LOGIN: "/login",
+  REGISTER: "/register",
+  DASHBOARD: "/dashboard",
+  PROFILE: "/profile",
+  SETTINGS: "/settings",
+  POS: "/pos",
+  PRODUCTS: "/products",
+  CUSTOMERS: "/customers",
+  SUPPLIERS: "/suppliers",
+  INVENTORY: "/inventory",
+  ACCOUNTING: "/accounting",
+  BILLING: "/billing",
+  INVOICES: "/invoices",
+  REPORTS: "/reports",
+  SYSTEM: "/system",
+  RESET_PASSWORD: "/reset-password",
+  FISCAL_DOCUMENTS: "/fiscal-documents",
+  DGII_REPORTS: "/dgii-reports",
+  USER_MANAGEMENT: "/user-management",
+  COMPANY_SETTINGS: "/company-settings",
+  SUPER_ADMIN: "/super-admin",
+  AI_ASSISTANT: "/ai-assistant",
+  NOTIFICATIONS: "/notifications",
+  WAREHOUSES: "/warehouses",
+  MOVEMENTS: "/movements",
+  HR: "/hr",
+  EMPLOYEES: "/employees",
+  PAYROLL: "/payroll",
+  SETUP: "/setup"
+} as const;
+
+export type RouteKey = keyof typeof ROUTES;
+export type RoutePath = typeof ROUTES[RouteKey];
