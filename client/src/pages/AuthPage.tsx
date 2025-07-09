@@ -14,7 +14,7 @@ import { Eye, EyeOff, Building, Lock, Mail, User, Search, Check, AlertCircle } f
 import { Badge } from "@/components/ui/badge";
 
 import fourOneLogo from "@assets/Four One Solutions Logo.png";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useRouter } from "wouter";
 import { ROUTES } from "@/config/routes";
 import FourOneLoginAnimation from "@/components/FourOneLoginAnimation";
 
@@ -76,27 +76,26 @@ export default function AuthPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
- const navigate = useNavigate();
- const location = useLocation();
+ const router = useRouter();
+ const [location] = useLocation();
 
   // Automatically switch to register tab if accessing via /register route
   useEffect(() => {
-  if (location.pathname === ROUTES.REGISTER) {
+  if (location === ROUTES.REGISTER) {
     setActiveTab("register");
-  } else if (location.pathname === ROUTES.FORGOT_PASSWORD) {
+  } else if (location === "/forgot-password") {
     setActiveTab("forgot-password");
   }
 }, [location]);
 
   const handleTabChange = (tab: string) => {
   setActiveTab(tab);
-  navigate(
+  router.navigate(
     tab === "login" 
       ? ROUTES.LOGIN 
       : tab === "register" 
         ? ROUTES.REGISTER 
-        : ROUTES.FORGOT_PASSWORD,
-    { replace: true }
+        : "/forgot-password"
   );
 };
 
@@ -307,7 +306,7 @@ export default function AuthPage() {
           variant: "destructive",
         });
         setTimeout(() => {
-          navigate(ROUTES.PAYMENT);
+          router.navigate(ROUTES.PAYMENT);
         }, 2000);
       } else {
         // Parse the error message if it contains status codes
@@ -376,7 +375,7 @@ export default function AuthPage() {
         description: "Ahora debes completar tu pago para activar tu cuenta.",
       });
       // Redirect to setup page for trial users
-      navigate(ROUTES.SETUP, { replace: true });
+      router.navigate(ROUTES.SETUP);
     },
     onError: (error: any) => {
       console.error('Registration error:', error); // Debug log
@@ -437,7 +436,7 @@ export default function AuthPage() {
   const handleAnimationComplete = () => {
     setShowLoginAnimation(false);
     // Redirect to dashboard after successful login
-    navigate(ROUTES.DASHBOARD, { replace: true });
+    router.navigate(ROUTES.DASHBOARD);
   };
 
   return (
