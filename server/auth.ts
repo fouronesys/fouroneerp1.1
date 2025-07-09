@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { sessionAuth } from "./middleware/session-auth";
 
 declare global {
   namespace Express {
@@ -169,13 +170,19 @@ export function setupAuth(app: Express) {
     )
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
+  passport.serializeUser((user, done) => {
+    console.log("[DEBUG] serializeUser called with user:", user.id);
+    done(null, user.id);
+  });
   
   passport.deserializeUser(async (id: string, done) => {
+    console.log("[DEBUG] deserializeUser called with id:", id);
     try {
       const user = await storage.getUser(id);
+      console.log("[DEBUG] deserializeUser found user:", user ? user.id : "null");
       done(null, user);
     } catch (error) {
+      console.error("[DEBUG] deserializeUser error:", error);
       done(error);
     }
   });
@@ -403,26 +410,35 @@ export function setupAuth(app: Express) {
   app.post("/api/logout", logoutHandler);
   app.get("/api/logout", logoutHandler);
 
-  // Get current user endpoint
-  app.get("/api/user", (req, res) => {
-    console.log("[DEBUG] /api/user - Session ID:", req.sessionID);
-    console.log("[DEBUG] /api/user - Session data:", req.session);
-    console.log("[DEBUG] /api/user - isAuthenticated():", req.isAuthenticated());
+  // Get current user endpoint - Updated to use token-based authentication
+  app.get("/api/user", sessionAuth, async (req, res) => {
+    console.log("[DEBUG] /api/user - Token-based auth");
     console.log("[DEBUG] /api/user - req.user:", req.user);
     
-    if (!req.isAuthenticated() || !req.user) {
+    if (!req.user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
     
-    res.json({
-      id: req.user.id,
-      email: req.user.email,
-      firstName: req.user.firstName,
-      lastName: req.user.lastName,
-      role: req.user.role,
-      profileImageUrl: req.user.profileImageUrl,
-      isActive: req.user.isActive,
-    });
+    try {
+      // Get full user details from database
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: req.user.role,
+        profileImageUrl: user.profileImageUrl,
+        isActive: user.isActive,
+      });
+    } catch (error) {
+      console.error("[DEBUG] /api/user - Error fetching user:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
   });
 
   // Change password endpoint
