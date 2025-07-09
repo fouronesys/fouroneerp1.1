@@ -75,6 +75,21 @@ export const loginAttempts = pgTable("login_attempts", {
   attemptedAt: timestamp("attempted_at").defaultNow(),
 });
 
+// Session tokens table for token-based authentication (like WhatsApp)
+export const sessionTokens = pgTable("session_tokens", {
+  id: serial("id").primaryKey(),
+  token: varchar("token", { length: 64 }).unique().notNull(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  sessionData: text("session_data").notNull(), // JSON string with session info
+  expiresAt: timestamp("expires_at").notNull(),
+  lastActivity: timestamp("last_activity").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_session_tokens_token").on(table.token),
+  index("idx_session_tokens_user_id").on(table.userId),
+  index("idx_session_tokens_expires_at").on(table.expiresAt),
+]);
+
 // Company Users - Junction table for user-company relationships
 export const companyUsers = pgTable("company_users", {
   id: serial("id").primaryKey(),

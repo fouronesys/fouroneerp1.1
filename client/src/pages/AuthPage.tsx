@@ -10,11 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, EyeOff, Building, Lock, Mail, User, Search, Check, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Building, Lock, Mail, User, Search, Check, AlertCircle, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useTokenAuth } from "@/hooks/useTokenAuth";
 
 import fourOneLogo from "@assets/Four One Solutions Logo.png";
-import { useLocation, useRouter } from "wouter";
+import { useLocation } from "wouter";
 import { ROUTES } from "@/config/routes";
 import FourOneLoginAnimation from "@/components/FourOneLoginAnimation";
 
@@ -68,6 +69,7 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const { login, loading: authLoading } = useTokenAuth();
   const [showLoginAnimation, setShowLoginAnimation] = useState(false);
   const [isVerifyingRNC, setIsVerifyingRNC] = useState(false);
   const [rncValidationResult, setRncValidationResult] = useState<RNCValidationResult | null>(null);
@@ -76,8 +78,7 @@ export default function AuthPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
- const router = useRouter();
- const [location] = useLocation();
+ const [location, setLocation] = useLocation();
 
   // Automatically switch to register tab if accessing via /register route
   useEffect(() => {
@@ -90,7 +91,7 @@ export default function AuthPage() {
 
   const handleTabChange = (tab: string) => {
   setActiveTab(tab);
-  router.navigate(
+  setLocation(
     tab === "login" 
       ? ROUTES.LOGIN 
       : tab === "register" 
@@ -234,7 +235,7 @@ export default function AuthPage() {
   const loginMutation = useMutation({
     mutationFn: async (data: LoginForm) => {
       try {
-        const response = await fetch("/api/login", {
+        const response = await fetch("/api/auth/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -243,28 +244,19 @@ export default function AuthPage() {
           credentials: "include",
         });
 
-        if (!response.ok) {
-          const contentType = response.headers.get('content-type');
-          let errorMessage = "Login failed";
-          
-          if (contentType && contentType.includes('application/json')) {
-            const errorData = await response.json();
-            errorMessage = errorData.message || "Invalid credentials";
-          } else {
-            errorMessage = await response.text() || "Server error";
-          }
-          
-          throw new Error(errorMessage);
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Invalid credentials");
         }
 
-        const result = await response.json();
         return result;
       } catch (error) {
         console.error("Login mutation error:", error);
         throw error;
       }
     },
-    onSuccess: (user) => {
+    onSuccess: (result) => {
       toast({
         title: "¡Bienvenido de vuelta!",
         description: "Has iniciado sesión exitosamente.",
@@ -306,7 +298,7 @@ export default function AuthPage() {
           variant: "destructive",
         });
         setTimeout(() => {
-          router.navigate(ROUTES.PAYMENT);
+          setLocation(ROUTES.PAYMENT);
         }, 2000);
       } else {
         // Parse the error message if it contains status codes
@@ -375,7 +367,7 @@ export default function AuthPage() {
         description: "Ahora debes completar tu pago para activar tu cuenta.",
       });
       // Redirect to setup page for trial users
-      router.navigate(ROUTES.SETUP);
+      setLocation(ROUTES.SETUP);
     },
     onError: (error: any) => {
       console.error('Registration error:', error); // Debug log
@@ -421,8 +413,34 @@ export default function AuthPage() {
     },
   });
 
-  const onLogin = (data: LoginForm) => {
-    loginMutation.mutate(data);
+  const onLogin = async (data: LoginForm) => {
+    try {
+      const result = await login(data.email, data.password);
+      
+      if (result.success) {
+        toast({
+          title: "¡Bienvenido!",
+          description: "Has iniciado sesión exitosamente.",
+        });
+        
+        setShowLoginAnimation(true);
+        setTimeout(() => {
+          setLocation(ROUTES.DASHBOARD);
+        }, 2000);
+      } else {
+        toast({
+          title: "Error de autenticación",
+          description: result.message || "Credenciales incorrectas",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error de conexión",
+        description: "No se pudo conectar al servidor",
+        variant: "destructive",
+      });
+    }
   };
 
   const onRegister = (data: RegisterForm) => {
@@ -436,7 +454,7 @@ export default function AuthPage() {
   const handleAnimationComplete = () => {
     setShowLoginAnimation(false);
     // Redirect to dashboard after successful login
-    router.navigate(ROUTES.DASHBOARD);
+    setLocation(ROUTES.DASHBOARD);
   };
 
   return (
@@ -618,9 +636,16 @@ export default function AuthPage() {
                         <Button
                           type="submit"
                           className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                          disabled={loginMutation.isPending}
+                          disabled={authLoading || loginForm.formState.isSubmitting}
                         >
-                          {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar Sesión"}
+                          {authLoading || loginForm.formState.isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Iniciando sesión...
+                            </>
+                          ) : (
+                            "Iniciar Sesión"
+                          )}
                         </Button>
                         
                         <div className="text-center mt-4">

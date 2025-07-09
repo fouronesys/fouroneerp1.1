@@ -5,6 +5,9 @@ import multer from "multer";
 import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, hashPassword, comparePasswords } from "./auth";
+import { sessionAuth, requireSuperAdmin, requireRole, requireCompanyAccess } from "./middleware/session-auth";
+import authRoutes from "./routes/auth";
+import { AuthService } from "./auth-service";
 import { auditLogger } from "./audit-logger";
 import { initializeAdminUser } from "./init-admin";
 import { moduleInitializer } from "./module-initializer";
@@ -88,13 +91,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve static files from uploads directory
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-  // Session heartbeat endpoint to keep sessions alive during deployments
+  // New token-based authentication routes
+  app.use('/api/auth', authRoutes);
+
+  // Legacy session heartbeat endpoint - deprecated in favor of token system
   app.post("/api/auth/heartbeat", isAuthenticated, async (req: any, res) => {
     try {
       res.json({ 
         status: 'alive',
         userId: req.user.id,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        deprecated: true,
+        message: 'Use new token-based authentication system'
       });
     } catch (error) {
       console.error("Heartbeat error:", error);
@@ -131,10 +139,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin company management endpoints
-  app.get("/api/admin/companies", simpleAuth, async (req: any, res) => {
+  // Admin company management endpoints - Requires super admin access
+  app.get("/api/admin/companies", requireSuperAdmin, async (req: any, res) => {
     try {
-      console.log(`[DEBUG] Fetching admin companies for user: ${req.user.id}`);
+      console.log(`[DEBUG] Fetching admin companies for super admin: ${req.user.email}`);
       const companies = await storage.getAllCompaniesWithDetails();
       
       // Map paymentStatus to paymentConfirmed for frontend consistency
@@ -144,7 +152,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }));
       
       console.log(`[DEBUG] Found ${companies.length} admin companies`);
-      console.log(`[DEBUG] Mapped company data:`, mappedCompanies[0]);
       res.json(mappedCompanies);
     } catch (error) {
       console.error("Error fetching companies:", error);
@@ -152,36 +159,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update company status (activate/deactivate)
-  app.patch("/api/admin/companies/:id/status", isAuthenticated, superAdminOnly, async (req: any, res) => {
+  // Update company status (activate/deactivate) - Super admin only
+  app.patch("/api/admin/companies/:id/status", requireSuperAdmin, async (req: any, res) => {
     try {
-
-      const { id } = req.params;
+      const companyId = parseInt(req.params.id);
       const { isActive } = req.body;
-
-      const company = await storage.updateCompanyStatus(parseInt(id), isActive);
       
-      // Log company status update
-      await auditLogger.logUserAction(
-        req.user.id,
-        parseInt(id),
-        isActive ? 'COMPANY_ACTIVATED' : 'COMPANY_DEACTIVATED',
-        'company',
-        id,
-        undefined,
-        { isActive },
-        req
-      );
+      console.log(`[DEBUG] Super admin ${req.user.email} updating company ${companyId} status to ${isActive}`);
       
-      res.json(company);
+      await storage.updateCompanyStatus(companyId, isActive);
+      
+      res.json({ 
+        success: true, 
+        message: `Company ${isActive ? 'activated' : 'deactivated'} successfully` 
+      });
     } catch (error) {
       console.error("Error updating company status:", error);
       res.status(500).json({ message: "Failed to update company status" });
     }
   });
 
-  // Update company details (full PATCH endpoint)
-  app.patch("/api/admin/companies/:id", simpleAuth, async (req: any, res) => {
+  // Create new company - Super admin only
+  app.post("/api/admin/companies", requireSuperAdmin, async (req: any, res) => {
+    try {
+      console.log(`[DEBUG] Super admin ${req.user.email} creating new company`);
+      const company = await storage.createCompany(req.body);
+      
+      res.json({ 
+        success: true, 
+        company,
+        message: 'Company created successfully' 
+      });
+    } catch (error) {
+      console.error("Error creating company:", error);
+      res.status(500).json({ message: "Failed to create company" });
+    }
+  });
+
+  // Update company details - Super admin only
+  app.put("/api/admin/companies/:id", requireSuperAdmin, async (req: any, res) => {
+    try {
+      const companyId = parseInt(req.params.id);
+      console.log(`[DEBUG] Super admin ${req.user.email} updating company ${companyId}`);
+      
+      const company = await storage.updateCompany(companyId, req.body);
+      
+      res.json({ 
+        success: true, 
+        company,
+        message: 'Company updated successfully' 
+      });
+    } catch (error) {
+      console.error("Error updating company:", error);
+      res.status(500).json({ message: "Failed to update company" });
+    }
+  });
+
+  // Delete company - Super admin only
+  app.delete("/api/admin/companies/:id", requireSuperAdmin, async (req: any, res) => {
+    try {
+      const companyId = parseInt(req.params.id);
+      console.log(`[DEBUG] Super admin ${req.user.email} deleting company ${companyId}`);
+      
+      await storage.deleteCompany(companyId);
+      
+      res.json({ 
+        success: true, 
+        message: 'Company deleted successfully' 
+      });
+    } catch (error) {
+      console.error("Error deleting company:", error);
+      res.status(500).json({ message: "Failed to delete company" });
+    }
+  });
+
+  // Update company details (full PATCH endpoint) - Super admin only
+  app.patch("/api/admin/companies/:id", requireSuperAdmin, async (req: any, res) => {
     try {
       const { id } = req.params;
       const companyId = parseInt(id);
@@ -563,14 +616,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Basic user endpoint for authenticated users
-  app.get("/api/user", simpleAuth, async (req: any, res) => {
+  // Basic user endpoint for authenticated users - Updated to support token auth
+  app.get("/api/user", sessionAuth, async (req: any, res) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      
       const user = await storage.getUser(req.user.id);
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(401).json({ message: "Not authenticated" });
+    }
+  });
+
+  // Legacy login endpoint for compatibility
+  app.post("/api/login", async (req: any, res) => {
+    const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    
+    try {
+      const { email, password } = req.body;
+      const result = await AuthService.login(email, password, ipAddress, userAgent);
+
+      if (!result.success) {
+        return res.status(401).json({
+          message: result.message
+        });
+      }
+
+      // Set session token cookie
+      res.cookie('sessionToken', result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
+        path: '/'
+      });
+
+      res.json(result.user);
+    } catch (error) {
+      console.error("Legacy login error:", error);
+      res.status(500).json({ message: "Login failed" });
     }
   });
 
