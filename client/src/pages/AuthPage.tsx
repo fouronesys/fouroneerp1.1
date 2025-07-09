@@ -904,19 +904,19 @@ export default function AuthPage() {
                           )}
                         />
                         <Button
-                          type="submit"
-                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                          disabled={authLoading || loginForm.formState.isSubmitting}
-                        >
-                          {authLoading || loginForm.formState.isSubmitting ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Iniciando sesión...
-                            </>
-                          ) : (
-                            "Iniciar Sesión"
-                          )}
-                        </Button>
+  type="submit"
+  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+  disabled={loginMutation.isPending || loginForm.formState.isSubmitting}
+>
+  {loginMutation.isPending || loginForm.formState.isSubmitting ? (
+    <>
+      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      Iniciando sesión...
+    </>
+  ) : (
+    "Iniciar Sesión"
+  )}
+</Button>
                         
                         <div className="text-center mt-4">
                           <Button
