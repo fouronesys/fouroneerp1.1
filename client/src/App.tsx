@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useSessionPersistence } from "@/hooks/useSessionPersistence";
+import { useTokenAuth } from "@/hooks/useTokenAuth";
 import { ConnectionStatus } from "@/components/ConnectionStatus";
 import { registerSW } from "@/lib/serviceWorkerRegistration";
 import InstallPrompt from "@/components/InstallPrompt";
@@ -88,25 +89,22 @@ import NotFound from "@/pages/not-found";
 import LoginAnimation from "@/components/LoginAnimation";
 
 function ProtectedRoute({ component: Component, ...props }: { component: React.ComponentType }) {
-  // Check user authentication status
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["/api/user"],
-    retry: false,
-  });
+  // Use token authentication instead of old query
+  const { authenticated, user, loading } = useTokenAuth();
 
   // Check payment status for authenticated users
   const { data: paymentStatus, isLoading: isPaymentLoading } = useQuery({
     queryKey: ["/api/user/payment-status"],
-    enabled: !!user,
+    enabled: authenticated && !!user,
     retry: false,
   });
 
   const { toast } = useToast();
-  const isAuthenticated = !!user;
+  const isAuthenticated = authenticated;
   const hasValidPayment = (paymentStatus as any)?.hasValidPayment === true;
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       toast({
         title: "Acceso no autorizado",
         description: "Debes iniciar sesión para acceder a esta página.",
@@ -116,7 +114,7 @@ function ProtectedRoute({ component: Component, ...props }: { component: React.C
         window.location.href = "/auth";
       }, 1000);
     }
-  }, [isAuthenticated, isLoading, toast]);
+  }, [isAuthenticated, loading, toast]);
 
   useEffect(() => {
     // Super admins bypass payment requirements
@@ -147,7 +145,7 @@ function ProtectedRoute({ component: Component, ...props }: { component: React.C
     }
   }, [isAuthenticated, isPaymentLoading, hasValidPayment, paymentStatus, (user as any)?.role, toast]);
 
-  if (isLoading || (isAuthenticated && isPaymentLoading)) {
+  if (loading || (isAuthenticated && isPaymentLoading)) {
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center z-50">
         <div className="text-center max-w-md mx-auto px-6">
@@ -192,14 +190,11 @@ function ProtectedRoute({ component: Component, ...props }: { component: React.C
 }
 
 function Router() {
-  // Check user authentication status
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["/api/user"],
-    retry: false,
-  });
+  // Use token authentication instead of old query
+  const { authenticated, user, loading } = useTokenAuth();
 
   const [setupComplete, setSetupComplete] = useState(false);
-  const isAuthenticated = !!user;
+  const isAuthenticated = authenticated;
   
   // Initialize session persistence to maintain login during deployments
   const { isReconnecting, reconnectAttempts } = useSessionPersistence({
@@ -232,7 +227,7 @@ function Router() {
   }, [user, company]);
 
   // Show loading during authentication check
-  if (isLoading || (isAuthenticated && paymentLoading)) {
+  if (loading || (isAuthenticated && paymentLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="flex flex-col items-center space-y-4">

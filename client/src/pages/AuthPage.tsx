@@ -423,10 +423,9 @@ export default function AuthPage() {
           description: "Has iniciado sesión exitosamente.",
         });
         
-        setShowLoginAnimation(true);
-        setTimeout(() => {
-          setLocation(ROUTES.DASHBOARD);
-        }, 2000);
+        // Navigate immediately to dashboard after successful login
+        queryClient.clear();
+        setLocation(ROUTES.DASHBOARD);
       } else {
         toast({
           title: "Error de autenticación",
