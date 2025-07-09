@@ -19,7 +19,7 @@ const changePasswordSchema = z.object({
 
 /**
  * POST /api/auth/login
- * Login con email y contraseña - Sistema tipo WhatsApp
+ * Login con email y contraseña - Usando tokens
  */
 router.post('/login', async (req: Request, res: Response) => {
   try {
