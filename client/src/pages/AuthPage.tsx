@@ -922,7 +922,7 @@ export default function AuthPage() {
                           <Button
                             type="button"
                             variant="link"
-                            ="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
                             onClick={() => setActiveTab('forgot-password')}
                           >
                             ¿Olvidaste tu contraseña?
@@ -932,355 +932,351 @@ export default function AuthPage() {
                     </Form>
                   </TabsContent>
 
-                  {/* Register Tab */}
-                  <TabsContent value="register">
-                    <Form {...registerForm}>
-                      <form onSubmit={registerForm.handleSubmit(onRegister)} ="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={registerForm.control}
-                            name="firstName"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel ="text-gray-700 dark:text-gray-200">Nombre</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <User ="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                    <Input
-                                      placeholder="Tu nombre"
-                                      ="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                      {...field}
-                                    />
-                                  </div>
-                                </FormControl>
-                                <FormMessage ="text-red-500 dark:text-red-400" />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={registerForm.control}
-                            name="lastName"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel ="text-gray-700 dark:text-gray-200">Apellido</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <User ="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                    <Input
-                                      placeholder="Tu apellido"
-                                      ="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                      {...field}
-                                    />
-                                  </div>
-                                </FormControl>
-                                <FormMessage ="text-red-500 dark:text-red-400" />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        <FormField
-                          control={registerForm.control}
-                          name="companyName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel ="text-gray-700 dark:text-gray-200">Nombre de la Empresa</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Building ="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                  <Input
-                                    placeholder="Nombre de tu empresa o buscar por RNC"
-                                    ="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                    {...field}
-                                    onChange={(e) => {
-                                      field.onChange(e);
-                                      // Buscar empresas si se está escribiendo texto
-                                      if (e.target.value.length >= 3) {
-                                        searchRNCCompanies(e.target.value);
-                                      } else {
-                                        setShowSuggestions(false);
-                                      }
-                                    }}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage ="text-red-500 dark:text-red-400" />
-                              
-                              {/* Sugerencias de empresas */}
-                              {showSuggestions && rncSuggestions.length > 0 && (
-                                <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                                  {rncSuggestions.map((suggestion, index) => (
-                                    <div
-                                      key={index}
-                                      className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0"
-                                      onClick={() => selectRNCFromSuggestion(suggestion)}
-                                    >
-                                      <div className="font-medium text-gray-900 dark:text-white truncate">
-                                        {suggestion.name}
-                                      </div>
-                                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                                        RNC: {suggestion.rnc}
-                                      </div>
-                                      {suggestion.categoria && (
-                                        <div className="text-xs text-blue-600 dark:text-blue-400">
-                                          {suggestion.categoria}
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </FormItem>
-                          )}
-                        />
+{/* Register Tab */}
+<TabsContent value="register">
+  <Form {...registerForm}>
+    <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          control={registerForm.control}
+          name="firstName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-700 dark:text-gray-200">Nombre</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <Input
+                    placeholder="Tu nombre"
+                    className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage className="text-red-500 dark:text-red-400" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={registerForm.control}
+          name="lastName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-700 dark:text-gray-200">Apellido</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <Input
+                    placeholder="Tu apellido"
+                    className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage className="text-red-500 dark:text-red-400" />
+            </FormItem>
+          )}
+        />
+      </div>
+      <FormField
+        control={registerForm.control}
+        name="companyName"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-gray-700 dark:text-gray-200">Nombre de la Empresa</FormLabel>
+            <FormControl>
+              <div className="relative">
+                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <Input
+                  placeholder="Nombre de tu empresa o buscar por RNC"
+                  className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    if (e.target.value.length >= 3) {
+                      searchRNCCompanies(e.target.value);
+                    } else {
+                      setShowSuggestions(false);
+                    }
+                  }}
+                />
+              </div>
+            </FormControl>
+            <FormMessage className="text-red-500 dark:text-red-400" />
+            
+            {showSuggestions && rncSuggestions.length > 0 && (
+              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                {rncSuggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0"
+                    onClick={() => selectRNCFromSuggestion(suggestion)}
+                  >
+                    <div className="font-medium text-gray-900 dark:text-white truncate">
+                      {suggestion.name}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      RNC: {suggestion.rnc}
+                    </div>
+                    {suggestion.categoria && (
+                      <div className="text-xs text-blue-600 dark:text-blue-400">
+                        {suggestion.categoria}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </FormItem>
+        )}
+      />
 
-                        <FormField
-                          control={registerForm.control}
-                          name="rnc"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
-                                RNC (Registro Nacional del Contribuyente)
-                                {isVerifyingRNC && <Search className="h-3 w-3 animate-spin" />}
-                              </FormLabel>
-                              <FormControl>
-                                <div className="flex gap-2">
-                                  <div className="relative flex-1">
-                                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                    <Input
-                                      placeholder="131-12345-6 (opcional)"
-                                      className={`pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 ${
-                                        rncValidationResult?.valid === true 
-                                          ? "border-green-500 bg-green-50 dark:bg-green-950" 
-                                          : rncValidationResult?.valid === false 
-                                          ? "border-red-500 bg-red-50 dark:bg-red-950" 
-                                          : ""
-                                      }`}
-                                      {...field}
-                                      onChange={(e) => {
-                                        field.onChange(e);
-                                        // Limpiar validación anterior
-                                        if (rncValidationResult) {
-                                          setRncValidationResult(null);
-                                        }
-                                      }}
-                                      onBlur={(e) => {
-                                        const rncValue = e.target.value?.replace(/\D/g, '') || '';
-                                        if (rncValue && rncValue.length >= 9) {
-                                          handleRNCVerification(rncValue);
-                                        }
-                                      }}
-                                    />
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={isVerifyingRNC || !field.value}
-                                    onClick={() => {
-                                      const rncValue = field.value?.replace(/\D/g, '') || '';
-                                      if (rncValue) {
-                                        handleRNCVerification(rncValue);
-                                      }
-                                    }}
-                                    className="px-3"
-                                  >
-                                    {isVerifyingRNC ? (
-                                      <Search className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                      "Verificar"
-                                    )}
-                                  </Button>
-                                </div>
-                              </FormControl>
-                              
-                              {/* Resultado de verificación de RNC */}
-                              {rncValidationResult && (
-                                <div className={`mt-2 p-2 rounded-md text-sm ${
-                                  rncValidationResult.valid
-                                    ? "bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800"
-                                    : "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
-                                }`}>
-                                  <div className="flex items-center gap-2">
-                                    {rncValidationResult.valid ? (
-                                      <Check className="h-4 w-4" />
-                                    ) : (
-                                      <AlertCircle className="h-4 w-4" />
-                                    )}
-                                    <span>{rncValidationResult.message}</span>
-                                  </div>
-                                  {rncValidationResult.data && (
-                                    <div className="mt-1 space-y-1">
-                                      {rncValidationResult.data.name && (
-                                        <div>Empresa: {rncValidationResult.data.name}</div>
-                                      )}
-                                      {rncValidationResult.data.categoria && (
-                                        <Badge variant="secondary" className="text-xs">
-                                          {rncValidationResult.data.categoria}
-                                        </Badge>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                              
-                              <FormMessage className="text-red-500 dark:text-red-400" />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={registerForm.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-700 dark:text-gray-200">Correo Electrónico</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                  <Input
-                                    type="email"
-                                    placeholder="Ingresa tu email"
-                                    className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                    {...field}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage className="text-red-500 dark:text-red-400" />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={registerForm.control}
-                          name="password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-700 dark:text-gray-200">Contraseña</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                  <Input
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="Ingresa tu contraseña"
-                                    className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                    {...field}
-                                  />
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                  >
-                                    {showPassword ? (
-                                      <EyeOff className="h-4 w-4" />
-                                    ) : (
-                                      <Eye className="h-4 w-4" />
-                                    )}
-                                  </Button>
-                                </div>
-                              </FormControl>
-                              <FormMessage className="text-red-500 dark:text-red-400" />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={registerForm.control}
-                          name="confirmPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-700 dark:text-gray-200">Confirmar Contraseña</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                  <Input
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    placeholder="Confirma tu contraseña"
-                                    className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                    {...field}
-                                  />
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                  >
-                                    {showConfirmPassword ? (
-                                      <EyeOff className="h-4 w-4" />
-                                    ) : (
-                                      <Eye className="h-4 w-4" />
-                                    )}
-                                  </Button>
-                                </div>
-                              </FormControl>
-                              <FormMessage className="text-red-500 dark:text-red-400" />
-                            </FormItem>
-                          )}
-                        />
-                        <Button
-                          type="submit"
-                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                          disabled={registerMutation.isPending}
-                        >
-                          {registerMutation.isPending ? "Creando cuenta..." : "Crear Cuenta"}
-                        </Button>
-                      </form>
-                    </Form>
-                  </TabsContent>
+      <FormField
+        control={registerForm.control}
+        name="rnc"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
+              RNC (Registro Nacional del Contribuyente)
+              {isVerifyingRNC && <Search className="h-3 w-3 animate-spin" />}
+            </FormLabel>
+            <FormControl>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <Input
+                    placeholder="131-12345-6 (opcional)"
+                    className={`pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 ${
+                      rncValidationResult?.valid === true 
+                        ? "border-green-500 bg-green-50 dark:bg-green-950" 
+                        : rncValidationResult?.valid === false 
+                        ? "border-red-500 bg-red-50 dark:bg-red-950" 
+                        : ""
+                    }`}
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      if (rncValidationResult) {
+                        setRncValidationResult(null);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const rncValue = e.target.value?.replace(/\D/g, '') || '';
+                      if (rncValue && rncValue.length >= 9) {
+                        handleRNCVerification(rncValue);
+                      }
+                    }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isVerifyingRNC || !field.value}
+                  onClick={() => {
+                    const rncValue = field.value?.replace(/\D/g, '') || '';
+                    if (rncValue) {
+                      handleRNCVerification(rncValue);
+                    }
+                  }}
+                  className="px-3"
+                >
+                  {isVerifyingRNC ? (
+                    <Search className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Verificar"
+                  )}
+                </Button>
+              </div>
+            </FormControl>
+            
+            {rncValidationResult && (
+              <div className={`mt-2 p-2 rounded-md text-sm ${
+                rncValidationResult.valid
+                  ? "bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800"
+                  : "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
+              }`}>
+                <div className="flex items-center gap-2">
+                  {rncValidationResult.valid ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4" />
+                  )}
+                  <span>{rncValidationResult.message}</span>
+                </div>
+                {rncValidationResult.data && (
+                  <div className="mt-1 space-y-1">
+                    {rncValidationResult.data.name && (
+                      <div>Empresa: {rncValidationResult.data.name}</div>
+                    )}
+                    {rncValidationResult.data.categoria && (
+                      <Badge variant="secondary" className="text-xs">
+                        {rncValidationResult.data.categoria}
+                      </Badge>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <FormMessage className="text-red-500 dark:text-red-400" />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={registerForm.control}
+        name="email"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-gray-700 dark:text-gray-200">Correo Electrónico</FormLabel>
+            <FormControl>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <Input
+                  type="email"
+                  placeholder="Ingresa tu email"
+                  className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                  {...field}
+                />
+              </div>
+            </FormControl>
+            <FormMessage className="text-red-500 dark:text-red-400" />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={registerForm.control}
+        name="password"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-gray-700 dark:text-gray-200">Contraseña</FormLabel>
+            <FormControl>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Ingresa tu contraseña"
+                  className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                  {...field}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </FormControl>
+            <FormMessage className="text-red-500 dark:text-red-400" />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={registerForm.control}
+        name="confirmPassword"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-gray-700 dark:text-gray-200">Confirmar Contraseña</FormLabel>
+            <FormControl>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirma tu contraseña"
+                  className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                  {...field}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </FormControl>
+            <FormMessage className="text-red-500 dark:text-red-400" />
+          </FormItem>
+        )}
+      />
+      <Button
+        type="submit"
+        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+        disabled={registerMutation.isPending}
+      >
+        {registerMutation.isPending ? "Creando cuenta..." : "Crear Cuenta"}
+      </Button>
+    </form>
+  </Form>
+</TabsContent>
 
-                  {/* Forgot Password Tab */}
-                  <TabsContent value="forgot-password">
-                    <Form {...forgotPasswordForm}>
-                      <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPassword)} className="space-y-4">
-                        <div className="text-center mb-4">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recuperar Contraseña</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                            Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
-                          </p>
-                        </div>
-                        
-                        <FormField
-                          control={forgotPasswordForm.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-700 dark:text-gray-200">Correo Electrónico</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                  <Input
-                                    type="email"
-                                    placeholder="Ingresa tu email"
-                                    className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                    {...field}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage className="text-red-500 dark:text-red-400" />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <Button
-                          type="submit"
-                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                          disabled={forgotPasswordMutation.isPending}
-                        >
-                          {forgotPasswordMutation.isPending ? "Enviando email..." : "Enviar Enlace de Recuperación"}
-                        </Button>
-                        
-                        <div className="text-center mt-4">
-                          <Button
-                            type="button"
-                            variant="link"
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
-                            onClick={() => setActiveTab('login')}
-                          >
-                            ← Volver al login
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </TabsContent>
+{/* Forgot Password Tab */}
+<TabsContent value="forgot-password">
+  <Form {...forgotPasswordForm}>
+    <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPassword)} className="space-y-4">
+      <div className="text-center mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recuperar Contraseña</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+          Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
+        </p>
+      </div>
+      
+      <FormField
+        control={forgotPasswordForm.control}
+        name="email"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-gray-700 dark:text-gray-200">Correo Electrónico</FormLabel>
+            <FormControl>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <Input
+                  type="email"
+                  placeholder="Ingresa tu email"
+                  className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                  {...field}
+                />
+              </div>
+            </FormControl>
+            <FormMessage className="text-red-500 dark:text-red-400" />
+          </FormItem>
+        )}
+      />
+      
+      <Button
+        type="submit"
+        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+        disabled={forgotPasswordMutation.isPending}
+      >
+        {forgotPasswordMutation.isPending ? "Enviando email..." : "Enviar Enlace de Recuperación"}
+      </Button>
+      
+      <div className="text-center mt-4">
+        <Button
+          type="button"
+          variant="link"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
+          onClick={() => setActiveTab('login')}
+        >
+          ← Volver al login
+        </Button>
+      </div>
+    </form>
+  </Form>
+</TabsContent>
                 </Tabs>
 
 
