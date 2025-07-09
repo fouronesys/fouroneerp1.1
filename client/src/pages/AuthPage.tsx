@@ -143,9 +143,10 @@ export default function AuthPage() {
           data: result.data
         });
         
-        if (result.data.name && !registerForm.getValues("companyName")) {
-          registerForm.setValue("companyName", result.data.name);
-        }
+        const currentCompanyName = registerForm.getValues("companyName");
+if (result.data.name && !currentCompanyName?.trim()) {
+  registerForm.setValue("companyName", result.data.name);
+}
         
         toast({
           title: "RNC Verificado",
