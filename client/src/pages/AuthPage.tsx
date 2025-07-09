@@ -918,7 +918,7 @@ export default function AuthPage() {
                           )}
                         </Button>
                         
-                        <div ="text-center mt-4">
+                        <div className="text-center mt-4">
                           <Button
                             type="button"
                             variant="link"
@@ -936,7 +936,7 @@ export default function AuthPage() {
                   <TabsContent value="register">
                     <Form {...registerForm}>
                       <form onSubmit={registerForm.handleSubmit(onRegister)} ="space-y-4">
-                        <div ="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                           <FormField
                             control={registerForm.control}
                             name="firstName"
@@ -944,7 +944,7 @@ export default function AuthPage() {
                               <FormItem>
                                 <FormLabel ="text-gray-700 dark:text-gray-200">Nombre</FormLabel>
                                 <FormControl>
-                                  <div ="relative">
+                                  <div className="relative">
                                     <User ="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                     <Input
                                       placeholder="Tu nombre"
@@ -964,7 +964,7 @@ export default function AuthPage() {
                               <FormItem>
                                 <FormLabel ="text-gray-700 dark:text-gray-200">Apellido</FormLabel>
                                 <FormControl>
-                                  <div ="relative">
+                                  <div className="relative">
                                     <User ="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                     <Input
                                       placeholder="Tu apellido"
@@ -985,7 +985,7 @@ export default function AuthPage() {
                             <FormItem>
                               <FormLabel ="text-gray-700 dark:text-gray-200">Nombre de la Empresa</FormLabel>
                               <FormControl>
-                                <div ="relative">
+                                <div className="relative">
                                   <Building ="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                   <Input
                                     placeholder="Nombre de tu empresa o buscar por RNC"
