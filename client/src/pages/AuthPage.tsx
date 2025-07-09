@@ -935,7 +935,7 @@ export default function AuthPage() {
 {/* Register Tab */}
 <TabsContent value="register">
   <Form {...registerForm}>
-    <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
+    <form onSubmit={registerForm.handleSubmit((data) => registerMutation.mutate(data))} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <FormField
           control={registerForm.control}
@@ -1226,7 +1226,7 @@ export default function AuthPage() {
 {/* Forgot Password Tab */}
 <TabsContent value="forgot-password">
   <Form {...forgotPasswordForm}>
-    <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPassword)} className="space-y-4">
+    <form onSubmit={forgotPasswordForm.handleSubmit((data) => forgotPasswordMutation.mutate(data))} className="space-y-4">
       <div className="text-center mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recuperar Contraseña</h3>
         <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
