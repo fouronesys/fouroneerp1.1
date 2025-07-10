@@ -339,7 +339,8 @@ export default function AuthPage() {
 
   const handleAnimationComplete = () => {
     setShowLoginAnimation(false);
-    setLocation("/");
+    // Reload the page to ensure clean state after login
+    window.location.reload();
   };
 
   return (
