@@ -73,14 +73,14 @@ export function InstallButton() {
     };
   }, []);
 
-  // Generate install options dynamically
+  // Generate install options dynamically - Windows installation disabled per user request
   const installOptions: InstallOption[] = [
-    // PWA Option - Always show if supported
+    // PWA Option - Only installation method available
     {
       platform: 'PWA',
       type: 'pwa',
       title: 'Instalar como App',
-      description: 'Instala Four One Solutions como aplicación en tu dispositivo',
+      description: 'Instala Four One Solutions como aplicación web progresiva en tu dispositivo',
       size: '~5 MB',
       features: [
         'Funcionalidad offline',
@@ -97,169 +97,9 @@ export function InstallButton() {
       icon: <Smartphone className="h-8 w-8" />,
       available: canInstallPWA,
       recommended: true
-    },
-    // Desktop options
-    {
-      platform: 'Windows',
-      type: 'desktop',
-      title: 'Four One Solutions Desktop',
-      description: 'Aplicación nativa para Windows con funcionalidad offline completa',
-      size: '~150 MB',
-      features: [
-        'Funcionalidad offline completa',
-        'Base de datos SQLite local',
-        'Sincronización automática',
-        'Instalador profesional',
-        'Integración con Windows'
-      ],
-      downloadUrl: '/download/windows-exe',
-      installSteps: [
-        'Descargar el instalador',
-        'Ejecutar como administrador',
-        'Seguir el asistente de instalación',
-        'Configurar ubicación de base de datos',
-        'Completar instalación'
-      ],
-      icon: <Monitor className="h-8 w-8" />,
-      available: true,
-      recommended: userPlatform === 'windows'
-    },
-    {
-      platform: 'macos',
-      type: 'desktop',
-      title: 'Four One Solutions para macOS',
-      description: 'Aplicación nativa para Mac con todas las funcionalidades',
-      size: '~140 MB',
-      features: [
-        'Funcionalidad offline completa',
-        'Base de datos SQLite local',
-        'Sincronización automática',
-        'Instalador .dmg',
-        'Integración con macOS'
-      ],
-      downloadUrl: '/downloads/desktop/Four-One-Solutions.dmg',
-      installSteps: [
-        'Descargar archivo .dmg',
-        'Abrir imagen de disco',
-        'Arrastrar a Aplicaciones',
-        'Permitir aplicación de desarrollador no identificado',
-        'Abrir desde Aplicaciones'
-      ],
-      icon: <Monitor className="h-8 w-8" />,
-      available: true,
-      recommended: userPlatform === 'macos'
-    },
-    {
-      platform: 'linux',
-      type: 'desktop',
-      title: 'Four One Solutions para Linux',
-      description: 'AppImage universal compatible con todas las distribuciones',
-      size: '~135 MB',
-      features: [
-        'Funcionalidad offline completa',
-        'Base de datos SQLite local',
-        'Sincronización automática',
-        'AppImage portable',
-        'Compatible con todas las distros'
-      ],
-      downloadUrl: '/downloads/desktop/Four-One-Solutions.AppImage',
-      installSteps: [
-        'Descargar AppImage',
-        'Dar permisos de ejecución: chmod +x',
-        'Ejecutar directamente',
-        'Opcional: integrar al sistema',
-        'Configurar base de datos local'
-      ],
-      icon: <Monitor className="h-8 w-8" />,
-      available: true,
-      recommended: userPlatform === 'linux'
-    },
-    // Mobile options
-    {
-      platform: 'Android',
-      type: 'desktop',
-      title: 'Four One Solutions Android',
-      description: 'Aplicación nativa para Android con funcionalidad offline',
-      size: '32.4 MB',
-      features: [
-        'Funcionalidad offline completa',
-        'Base de datos local SQLite',
-        'Sincronización automática',
-        'Interfaz móvil optimizada',
-        'Soporte para impresoras bluetooth'
-      ],
-      downloadUrl: '/download/android-apk',
-      installSteps: [
-        'Descargar archivo APK',
-        'Permitir instalación de orígenes desconocidos en Configuración',
-        'Abrir archivo APK descargado',
-        'Tocar "Instalar"',
-        'Abrir la aplicación'
-      ],
-      icon: <Smartphone className="h-8 w-8" />,
-      available: true,
-      recommended: userPlatform === 'android'
-    },
-    {
-      platform: 'pwa',
-      type: 'pwa',
-      title: 'Aplicación Web Progresiva',
-      description: 'Instala desde tu navegador, funciona offline',
-      size: '~5 MB cache',
-      features: [
-        'Instalación desde navegador',
-        'Cache inteligente offline',
-        'Sincronización en segundo plano',
-        'Notificaciones push',
-        'Actualizaciones automáticas'
-      ],
-      installSteps: 
-        userPlatform === 'ios' ? [
-          'Abrir en Safari',
-          'Tocar el botón Compartir',
-          'Seleccionar "Añadir a pantalla de inicio"',
-          'Confirmar instalación',
-          'Usar como app nativa'
-        ] : userPlatform === 'android' ? [
-          'Abrir en Chrome/Edge',
-          'Tocar "Instalar aplicación"',
-          'Confirmar instalación',
-          'Encontrar en apps instaladas',
-          'Usar como app nativa'
-        ] : [
-          'Abrir en Chrome/Edge/Firefox',
-          'Buscar icono "Instalar" en barra de direcciones',
-          'Hacer clic en "Instalar"',
-          'Confirmar instalación',
-          'Usar como app nativa'
-        ],
-      icon: <Smartphone className="h-8 w-8" />,
-      available: true,
-      recommended: userPlatform === 'ios'
-    },
-    {
-      platform: 'web',
-      type: 'web',
-      title: 'Aplicación Web',
-      description: 'Acceso directo desde cualquier navegador',
-      size: 'Sin descarga',
-      features: [
-        'Sin instalación requerida',
-        'Siempre actualizada',
-        'Acceso desde cualquier dispositivo',
-        'Sincronización en tiempo real',
-        'Respaldos automáticos en la nube'
-      ],
-      installSteps: [
-        'Abrir navegador web',
-        'Navegar a la aplicación',
-        'Iniciar sesión',
-        'Comenzar a usar inmediatamente',
-        'Crear marcador para acceso rápido'
-      ],
-      icon: <Globe className="h-8 w-8" />,
-      available: true
     }
+    // All desktop and mobile installations have been disabled per user request
+    // Only PWA installation is available
   ];
 
   const handlePWAInstall = async () => {

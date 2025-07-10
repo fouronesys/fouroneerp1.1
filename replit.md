@@ -237,6 +237,12 @@ The system follows a monolithic architecture with clear separation of concerns:
   - **AuthPage.tsx Updated**: Modified handleAnimationComplete function to redirect to homepage instead of dashboard
   - **User Experience Improved**: Login now correctly redirects to main landing page after successful authentication
   - **Consistent Navigation**: Maintains user preference for homepage as main entry point after login
+- July 10, 2025. **Windows Installation Disabled - PWA Only Installation:**
+  - **InstallPrompt.tsx Updated**: Disabled Windows installation popup, only shows PWA installation dialog
+  - **InstallButton.tsx Simplified**: Removed all desktop installation options (Windows, macOS, Linux) keeping only PWA
+  - **InstallationGuide.tsx Modified**: Removed entire Desktop Installation section, only PWA installation guide remains
+  - **User Experience Streamlined**: Landing page now shows only PWA installation option, no Windows desktop app prompts
+  - **Installation Method**: System now exclusively promotes PWA installation for all platforms
 - July 10, 2025. **SUCCESSFUL MIGRATION FROM REPLIT AGENT TO REPLIT ENVIRONMENT - PRODUCTION READY:**
   - **Complete System Migration**: Successfully migrated comprehensive Dominican Republic ERP system from Replit Agent to standard Replit environment
   - **Database Setup**: Created PostgreSQL database with 70+ tables, established proper schema deployment

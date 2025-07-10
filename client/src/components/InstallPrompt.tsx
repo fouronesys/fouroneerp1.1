@@ -59,13 +59,8 @@ export function InstallPrompt({ onDismiss }: InstallPromptProps) {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Para Windows, mostrar prompt si no está instalado
-    if (isWindows && !standalone) {
-      const hasShownWindowsPrompt = localStorage.getItem('windows-install-prompt-dismissed');
-      if (!hasShownWindowsPrompt) {
-        setTimeout(() => setShowPrompt(true), 2000);
-      }
-    }
+    // Disable Windows installation prompt - only show PWA installation
+    // Windows installation has been disabled per user request
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -107,35 +102,12 @@ export function InstallPrompt({ onDismiss }: InstallPromptProps) {
   };
 
   const getInstallContent = () => {
+    // Only show PWA installation - Windows installation disabled per user request
     switch (platform) {
-      case 'windows':
-        return {
-          title: 'Instalar Four One ERP para Windows',
-          description: 'Obtén la mejor experiencia con nuestra aplicación nativa para Windows.',
-          icon: <Monitor className="h-12 w-12 text-blue-600" />,
-          benefits: [
-            'Acceso offline completo',
-            'Integración con impresoras térmicas',
-            'Mejor rendimiento',
-            'Sincronización automática',
-            'Notificaciones de escritorio'
-          ],
-          primaryAction: {
-            label: 'Descargar para Windows',
-            action: handleDownloadWindows,
-            available: true
-          },
-          secondaryAction: {
-            label: 'Instalar PWA',
-            action: handleInstallPWA,
-            available: !!deferredPrompt
-          }
-        };
-
       case 'android':
         return {
           title: 'Instalar Four One ERP',
-          description: 'Instala nuestra app para un acceso rápido y funcionalidad offline.',
+          description: 'Instala nuestra app como PWA para un acceso rápido y funcionalidad offline.',
           icon: <Smartphone className="h-12 w-12 text-green-600" />,
           benefits: [
             'Funciona sin internet',
@@ -166,18 +138,20 @@ export function InstallPrompt({ onDismiss }: InstallPromptProps) {
         };
 
       default:
+        // For all platforms including Windows, only show PWA installation
         return {
           title: 'Instalar Four One ERP',
-          description: 'Instala nuestra aplicación para una mejor experiencia.',
+          description: 'Instala nuestra aplicación web progresiva para una mejor experiencia.',
           icon: <Download className="h-12 w-12 text-blue-600" />,
           benefits: [
             'Acceso offline',
             'Mejor rendimiento',
             'Notificaciones',
-            'Actualizaciones automáticas'
+            'Actualizaciones automáticas',
+            'Funciona en cualquier dispositivo'
           ],
           primaryAction: {
-            label: 'Instalar App',
+            label: 'Instalar PWA',
             action: handleInstallPWA,
             available: !!deferredPrompt
           }
