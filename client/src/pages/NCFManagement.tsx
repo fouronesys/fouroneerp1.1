@@ -332,7 +332,7 @@ export default function NCFManagement() {
     queryKey: ["/api/fiscal/ncf-sequences"],
   });
 
-  const { data: ncfUsados = [] } = useQuery<NCFUsado[]>({
+  const { data: ncfUsados = [], isLoading: isLoadingUsed } = useQuery<NCFUsado[]>({
     queryKey: ["/api/fiscal/ncf-used"],
   });
 
@@ -902,26 +902,34 @@ export default function NCFManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {ncfUsados.map((ncf) => (
-                    <TableRow key={ncf.id}>
-                      <TableCell className="font-mono">{ncf.ncf}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{ncf.tipo}</Badge>
-                      </TableCell>
-                      <TableCell>{ncf.documentoTipo}</TableCell>
-                      <TableCell>{format(new Date(ncf.fecha), 'dd/MM/yyyy')}</TableCell>
-                      <TableCell>{ncf.rncCliente || '-'}</TableCell>
-                      <TableCell className="max-w-xs truncate">
-                        {ncf.nombreCliente || 'Consumidor Final'}
-                      </TableCell>
-                      <TableCell>RD$ {parseFloat(ncf.monto).toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Badge variant={ncf.estado === 'used' ? 'default' : 'secondary'}>
-                          {ncf.estado}
-                        </Badge>
+                  {ncfUsados && ncfUsados.length > 0 ? (
+                    ncfUsados.map((ncf) => (
+                      <TableRow key={ncf.id}>
+                        <TableCell className="font-mono">{ncf.ncf}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{ncf.tipo}</Badge>
+                        </TableCell>
+                        <TableCell>{ncf.documentoTipo}</TableCell>
+                        <TableCell>{format(new Date(ncf.fecha), 'dd/MM/yyyy')}</TableCell>
+                        <TableCell>{ncf.rncCliente || '-'}</TableCell>
+                        <TableCell className="max-w-xs truncate">
+                          {ncf.nombreCliente || 'Consumidor Final'}
+                        </TableCell>
+                        <TableCell>RD$ {parseFloat(ncf.monto).toLocaleString()}</TableCell>
+                        <TableCell>
+                          <Badge variant={ncf.estado === 'used' ? 'default' : 'secondary'}>
+                            {ncf.estado}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                        No hay NCFs utilizados registrados
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
