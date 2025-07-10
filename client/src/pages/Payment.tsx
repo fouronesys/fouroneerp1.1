@@ -84,7 +84,7 @@ export default function Payment() {
   const handleLogout = async () => {
     try {
       // Call logout endpoint
-      const response = await fetch("/api/logout", {
+      const response = await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -136,8 +136,8 @@ export default function Payment() {
       }
       
       // Call logout API endpoint
-      await fetch('/api/logout', {
-        method: 'GET',
+      await fetch('/api/auth/logout', {
+        method: 'POST',
         credentials: 'include'
       });
       

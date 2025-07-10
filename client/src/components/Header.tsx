@@ -44,7 +44,7 @@ export function Header({ title, subtitle }: HeaderProps) {
       queryClient.clear();
       
       // Call logout endpoint
-      await fetch("/api/logout", {
+      await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
         headers: {
