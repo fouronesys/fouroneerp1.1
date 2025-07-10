@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { sessionManager } from '../session-manager';
+import { SessionManager } from '../session-manager';
+
+const sessionManager = SessionManager.getInstance();
 
 declare global {
   namespace Express {

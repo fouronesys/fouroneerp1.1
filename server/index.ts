@@ -1,5 +1,6 @@
 import "./memory-optimization"; // Import memory optimization first
 import express, { type Request, Response, NextFunction } from "express";
+import cookieParser from "cookie-parser";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { errorHandlerMiddleware } from "./error-management";
@@ -11,6 +12,9 @@ import { initializeOptimizedSystem } from "./init-optimized";
 process.env.TZ = 'America/Santo_Domingo';
 
 const app = express();
+
+// Cookie parser middleware for session token handling
+app.use(cookieParser());
 
 // Enhanced JSON parsing with error handling
 app.use(express.json({ 
