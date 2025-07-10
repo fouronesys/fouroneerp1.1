@@ -90,11 +90,11 @@ export default function AuthPage() {
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setLocation(
-      tab === "login" 
-        ? ROUTES.LOGIN 
-        : tab === "register" 
-          ? ROUTES.REGISTER 
-          : "/forgot-password"
+      tab === "login"
+        ? ROUTES.LOGIN
+        : tab === "register"
+        ? ROUTES.REGISTER
+        : "/forgot-password"
     );
   };
 
@@ -128,26 +128,26 @@ export default function AuthPage() {
 
   const handleRNCVerification = async (rncValue: string) => {
     if (!rncValue || rncValue.length < 9) return;
-    
+
     setIsVerifyingRNC(true);
     setRncValidationResult(null);
-    
+
     try {
       const response = await apiRequest(`/api/dgii/rnc-lookup?rnc=${encodeURIComponent(rncValue)}`);
       const result = await response.json();
-      
+
       if (result.success && result.data) {
         setRncValidationResult({
           valid: true,
           message: "RNC válido y encontrado en DGII",
-          data: result.data
+          data: result.data,
         });
-        
+
         const currentCompanyName = registerForm.getValues("companyName");
-if (result.data.name && !currentCompanyName?.trim()) {
-  registerForm.setValue("companyName", result.data.name);
-}
-        
+        if (result.data.name && !currentCompanyName?.trim()) {
+          registerForm.setValue("companyName", result.data.name);
+        }
+
         toast({
           title: "RNC Verificado",
           description: `Empresa: ${result.data.name || result.data.razonSocial}`,
@@ -155,13 +155,13 @@ if (result.data.name && !currentCompanyName?.trim()) {
       } else {
         setRncValidationResult({
           valid: false,
-          message: result.message || "RNC no encontrado en DGII"
+          message: result.message || "RNC no encontrado en DGII",
         });
       }
     } catch (error) {
       setRncValidationResult({
         valid: false,
-        message: "Error al verificar RNC. Intente nuevamente."
+        message: "Error al verificar RNC. Intente nuevamente.",
       });
     } finally {
       setIsVerifyingRNC(false);
@@ -178,16 +178,16 @@ if (result.data.name && !currentCompanyName?.trim()) {
     try {
       const response = await apiRequest(`/api/dgii/search-companies?query=${encodeURIComponent(searchTerm)}`);
       const result = await response.json();
-      
+
       if (result.success && result.data && Array.isArray(result.data)) {
         const suggestions = result.data.slice(0, 5).map((company: any) => ({
           rnc: company.rnc,
-          name: company.razonSocial || company.name || 'Empresa sin nombre',
+          name: company.razonSocial || company.name || "Empresa sin nombre",
           razonSocial: company.razonSocial,
           categoria: company.categoria || company.category,
-          estado: company.estado || company.status
+          estado: company.estado || company.status,
         }));
-        
+
         setRncSuggestions(suggestions);
         setShowSuggestions(true);
       } else {
@@ -197,13 +197,18 @@ if (result.data.name && !currentCompanyName?.trim()) {
     } catch (error) {
       setRncSuggestions([]);
       setShowSuggestions(false);
+      toast({
+        title: "Error",
+        description: "Error buscando empresas por RNC.",
+        variant: "destructive",
+      });
     }
   };
 
   const selectRNCFromSuggestion = (suggestion: RNCSuggestion) => {
     registerForm.setValue("rnc", suggestion.rnc);
     registerForm.setValue("companyName", suggestion.name);
-    
+
     setRncValidationResult({
       valid: true,
       message: "RNC seleccionado de la lista DGII",
@@ -212,13 +217,13 @@ if (result.data.name && !currentCompanyName?.trim()) {
         name: suggestion.name,
         razonSocial: suggestion.razonSocial,
         categoria: suggestion.categoria,
-        estado: suggestion.estado
-      }
+        estado: suggestion.estado,
+      },
     });
-    
+
     setShowSuggestions(false);
     setRncSuggestions([]);
-    
+
     toast({
       title: "Empresa Seleccionada",
       description: `${suggestion.name} - RNC: ${suggestion.rnc}`,
@@ -236,13 +241,13 @@ if (result.data.name && !currentCompanyName?.trim()) {
 
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || "Error de autenticación");
-      
+
       // Sincronizar con useTokenAuth
       const tokenAuthResult = await login(data.email, data.password);
       if (!tokenAuthResult.success) {
         throw new Error(tokenAuthResult.message);
       }
-      
+
       return result;
     },
     onSuccess: () => {
@@ -250,7 +255,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
         title: "¡Bienvenido!",
         description: "Has iniciado sesión exitosamente.",
       });
-      
+
       queryClient.invalidateQueries();
       setShowLoginAnimation(true);
     },
@@ -268,19 +273,19 @@ if (result.data.name && !currentCompanyName?.trim()) {
       const registrationData = {
         ...data,
         rnc: data.rnc || null,
-        rncValidation: rncValidationResult
+        rncValidation: rncValidationResult,
       };
-      
+
       const response = await apiRequest("/api/register", {
         method: "POST",
-        body: registrationData
+        body: registrationData,
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al crear la cuenta");
       }
-      
+
       return response.json();
     },
     onSuccess: (user) => {
@@ -307,12 +312,12 @@ if (result.data.name && !currentCompanyName?.trim()) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Error enviando email de recuperación");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -339,21 +344,24 @@ if (result.data.name && !currentCompanyName?.trim()) {
 
   return (
     <>
-      <FourOneLoginAnimation 
-        isVisible={showLoginAnimation} 
+      <FourOneLoginAnimation
+        isVisible={showLoginAnimation}
         onComplete={handleAnimationComplete}
       />
-      
+
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
         <div className="flex min-h-screen">
           {/* Left Column - Hero Section */}
           <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:px-8 xl:px-12 bg-gradient-to-br from-blue-600 to-indigo-800 relative overflow-hidden">
             <div className="absolute inset-0 bg-black/10">
-              <div className="absolute inset-0" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              }}></div>
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ff[...]`,
+                }}
+              ></div>
             </div>
-            
+
             <div className="relative z-10 max-w-md">
               <div className="mb-8">
                 <img
@@ -368,7 +376,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                   Solución integral para empresas dominicanas con módulos de manufactura, POS, inventario, RRHH y nómina.
                 </p>
               </div>
-              
+
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
@@ -379,7 +387,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                     <p className="text-blue-100">Manufactura, POS, inventario y más en una sola plataforma</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                     <Lock className="w-4 h-4 text-white" />
@@ -389,7 +397,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                     <p className="text-blue-100">Cumplimiento fiscal dominicano y seguridad de datos</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                     <User className="w-4 h-4 text-white" />
@@ -400,7 +408,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-8 pt-8 border-t border-blue-400/30">
                 <p className="text-blue-100 text-sm">
                   "Four One Solutions ha transformado completamente nuestra operación empresarial"
@@ -422,15 +430,21 @@ if (result.data.name && !currentCompanyName?.trim()) {
                   className="h-16 w-auto mx-auto mb-4"
                 />
               </div>
-              
+
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                  {activeTab === "login" ? "Bienvenido de vuelta" : "Únete a nosotros"}
+                  {activeTab === "login"
+                    ? "Bienvenido de vuelta"
+                    : activeTab === "register"
+                    ? "Únete a nosotros"
+                    : "Recupera tu contraseña"}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300">
-                  {activeTab === "login" 
-                    ? "Accede a tu cuenta para continuar" 
-                    : "Crea tu cuenta y comienza a gestionar tu empresa"}
+                  {activeTab === "login"
+                    ? "Accede a tu cuenta para continuar"
+                    : activeTab === "register"
+                    ? "Crea tu cuenta y comienza a gestionar tu empresa"
+                    : "Ingresa tu email para recuperar el acceso"}
                 </p>
               </div>
 
@@ -468,7 +482,8 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                     <Input
                                       type="email"
                                       placeholder="Ingresa tu email"
-                                      className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                                      autoComplete="username"
+                                      className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                       {...field}
                                     />
                                   </div>
@@ -489,7 +504,8 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                     <Input
                                       type={showPassword ? "text" : "password"}
                                       placeholder="Ingresa tu contraseña"
-                                      className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                                      autoComplete="current-password"
+                                      className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                       {...field}
                                     />
                                     <Button
@@ -525,13 +541,13 @@ if (result.data.name && !currentCompanyName?.trim()) {
                               "Iniciar Sesión"
                             )}
                           </Button>
-                          
+
                           <div className="text-center mt-4">
                             <Button
                               type="button"
                               variant="link"
                               className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
-                              onClick={() => setActiveTab('forgot-password')}
+                              onClick={() => setActiveTab("forgot-password")}
                             >
                               ¿Olvidaste tu contraseña?
                             </Button>
@@ -556,7 +572,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                       <Input
                                         placeholder="Tu nombre"
-                                        className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                                        className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                         {...field}
                                       />
                                     </div>
@@ -576,7 +592,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                       <Input
                                         placeholder="Tu apellido"
-                                        className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                                        className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                         {...field}
                                       />
                                     </div>
@@ -597,7 +613,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                     <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                     <Input
                                       placeholder="Nombre de tu empresa o buscar por RNC"
-                                      className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                                      className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                       {...field}
                                       onChange={(e) => {
                                         field.onChange(e);
@@ -611,7 +627,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                   </div>
                                 </FormControl>
                                 <FormMessage className="text-red-500 dark:text-red-400" />
-                                
+
                                 {showSuggestions && rncSuggestions.length > 0 && (
                                   <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
                                     {rncSuggestions.map((suggestion, index) => (
@@ -654,11 +670,11 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                       <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                       <Input
                                         placeholder="131-12345-6 (opcional)"
-                                        className={`pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 ${
-                                          rncValidationResult?.valid === true 
-                                            ? "border-green-500 bg-green-50 dark:bg-green-950" 
-                                            : rncValidationResult?.valid === false 
-                                            ? "border-red-500 bg-red-50 dark:bg-red-950" 
+                                        className={`pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                                          rncValidationResult?.valid === true
+                                            ? "border-green-500 bg-green-50 dark:bg-green-950"
+                                            : rncValidationResult?.valid === false
+                                            ? "border-red-500 bg-red-50 dark:bg-red-950"
                                             : ""
                                         }`}
                                         {...field}
@@ -669,7 +685,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                           }
                                         }}
                                         onBlur={(e) => {
-                                          const rncValue = e.target.value?.replace(/\D/g, '') || '';
+                                          const rncValue = e.target.value?.replace(/\D/g, "") || "";
                                           if (rncValue && rncValue.length >= 9) {
                                             handleRNCVerification(rncValue);
                                           }
@@ -682,7 +698,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                       size="sm"
                                       disabled={isVerifyingRNC || !field.value}
                                       onClick={() => {
-                                        const rncValue = field.value?.replace(/\D/g, '') || '';
+                                        const rncValue = field.value?.replace(/\D/g, "") || "";
                                         if (rncValue) {
                                           handleRNCVerification(rncValue);
                                         }
@@ -697,13 +713,15 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                     </Button>
                                   </div>
                                 </FormControl>
-                                
+
                                 {rncValidationResult && (
-                                  <div className={`mt-2 p-2 rounded-md text-sm ${
-                                    rncValidationResult.valid
-                                      ? "bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800"
-                                      : "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
-                                  }`}>
+                                  <div
+                                    className={`mt-2 p-2 rounded-md text-sm ${
+                                      rncValidationResult.valid
+                                        ? "bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800"
+                                        : "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
+                                    }`}
+                                  >
                                     <div className="flex items-center gap-2">
                                       {rncValidationResult.valid ? (
                                         <Check className="h-4 w-4" />
@@ -726,7 +744,7 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                     )}
                                   </div>
                                 )}
-                                
+
                                 <FormMessage className="text-red-500 dark:text-red-400" />
                               </FormItem>
                             )}
@@ -742,8 +760,9 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                     <Input
                                       type="email"
+                                      autoComplete="username"
                                       placeholder="Ingresa tu email"
-                                      className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                                      className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                       {...field}
                                     />
                                   </div>
@@ -763,8 +782,9 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                     <Input
                                       type={showPassword ? "text" : "password"}
+                                      autoComplete="new-password"
                                       placeholder="Ingresa tu contraseña"
-                                      className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                                      className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                       {...field}
                                     />
                                     <Button
@@ -797,8 +817,9 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                     <Input
                                       type={showConfirmPassword ? "text" : "password"}
+                                      autoComplete="new-password"
                                       placeholder="Confirma tu contraseña"
-                                      className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                                      className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                       {...field}
                                     />
                                     <Button
@@ -841,14 +862,17 @@ if (result.data.name && !currentCompanyName?.trim()) {
                     {/* Forgot Password Tab */}
                     <TabsContent value="forgot-password">
                       <Form {...forgotPasswordForm}>
-                        <form onSubmit={forgotPasswordForm.handleSubmit((data) => forgotPasswordMutation.mutate(data))} className="space-y-4">
+                        <form
+                          onSubmit={forgotPasswordForm.handleSubmit((data) => forgotPasswordMutation.mutate(data))}
+                          className="space-y-4"
+                        >
                           <div className="text-center mb-4">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recuperar Contraseña</h3>
                             <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                               Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
                             </p>
                           </div>
-                          
+
                           <FormField
                             control={forgotPasswordForm.control}
                             name="email"
@@ -858,480 +882,100 @@ if (result.data.name && !currentCompanyName?.trim()) {
                                 <FormControl>
                                   <div className="relative">
                                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                  <Input
-                                    type="email"
-                                    placeholder="Ingresa tu email"
-                                    className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                    {...field}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage className="text-red-500 dark:text-red-400" />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={loginForm.control}
-                          name="password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-700 dark:text-gray-200">Contraseña</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                                  <Input
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="Ingresa tu contraseña"
-                                    className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                    {...field}
-                                  />
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                  >
-                                    {showPassword ? (
-                                      <EyeOff className="h-4 w-4" />
-                                    ) : (
-                                      <Eye className="h-4 w-4" />
-                                    )}
-                                  </Button>
-                                </div>
-                              </FormControl>
-                              <FormMessage className="text-red-500 dark:text-red-400" />
-                            </FormItem>
-                          )}
-                        />
-                        <Button
-  type="submit"
-  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-  disabled={loginMutation.isPending || loginForm.formState.isSubmitting}
->
-  {loginMutation.isPending || loginForm.formState.isSubmitting ? (
-    <>
-      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      Iniciando sesión...
-    </>
-  ) : (
-    "Iniciar Sesión"
-  )}
-</Button>
-                        
-                        <div className="text-center mt-4">
+                                    <Input
+                                      type="email"
+                                      placeholder="Ingresa tu email"
+                                      autoComplete="username"
+                                      className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                                      {...field}
+                                    />
+                                  </div>
+                                </FormControl>
+                                <FormMessage className="text-red-500 dark:text-red-400" />
+                              </FormItem>
+                            )}
+                          />
+
                           <Button
-                            type="button"
-                            variant="link"
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
-                            onClick={() => setActiveTab('forgot-password')}
+                            type="submit"
+                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                            disabled={forgotPasswordMutation.isPending || forgotPasswordForm.formState.isSubmitting}
                           >
-                            ¿Olvidaste tu contraseña?
+                            {forgotPasswordMutation.isPending || forgotPasswordForm.formState.isSubmitting ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Enviando email...
+                              </>
+                            ) : (
+                              "Enviar Enlace de Recuperación"
+                            )}
                           </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </TabsContent>
 
-{/* Register Tab */}
-<TabsContent value="register">
-  <Form {...registerForm}>
-    <form onSubmit={registerForm.handleSubmit((data) => registerMutation.mutate(data))} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={registerForm.control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">Nombre</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                  <Input
-                    placeholder="Tu nombre"
-                    className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                    {...field}
-                  />
+                          <div className="text-center mt-4">
+                            <Button
+                              type="button"
+                              variant="link"
+                              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
+                              onClick={() => setActiveTab("login")}
+                            >
+                              ← Volver al login
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+
+              {/* Footer */}
+              <div className="mt-8 text-center">
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    © 2025 Four One Solutions. Todos los derechos reservados.
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Sistema ERP para empresas dominicanas
+                  </p>
                 </div>
-              </FormControl>
-              <FormMessage className="text-red-500 dark:text-red-400" />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={registerForm.control}
-          name="lastName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">Apellido</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                  <Input
-                    placeholder="Tu apellido"
-                    className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                    {...field}
-                  />
-                </div>
-              </FormControl>
-              <FormMessage className="text-red-500 dark:text-red-400" />
-            </FormItem>
-          )}
-        />
-      </div>
-      <FormField
-        control={registerForm.control}
-        name="companyName"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-gray-700 dark:text-gray-200">Nombre de la Empresa</FormLabel>
-            <FormControl>
-              <div className="relative">
-                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <Input
-                  placeholder="Nombre de tu empresa o buscar por RNC"
-                  className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                  {...field}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (e.target.value.length >= 3) {
-                      searchRNCCompanies(e.target.value);
-                    } else {
-                      setShowSuggestions(false);
-                    }
-                  }}
-                />
-              </div>
-            </FormControl>
-            <FormMessage className="text-red-500 dark:text-red-400" />
-            
-            {showSuggestions && rncSuggestions.length > 0 && (
-              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                {rncSuggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0"
-                    onClick={() => selectRNCFromSuggestion(suggestion)}
-                  >
-                    <div className="font-medium text-gray-900 dark:text-white truncate">
-                      {suggestion.name}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      RNC: {suggestion.rnc}
-                    </div>
-                    {suggestion.categoria && (
-                      <div className="text-xs text-blue-600 dark:text-blue-400">
-                        {suggestion.categoria}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={registerForm.control}
-        name="rnc"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
-              RNC (Registro Nacional del Contribuyente)
-              {isVerifyingRNC && <Search className="h-3 w-3 animate-spin" />}
-            </FormLabel>
-            <FormControl>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                  <Input
-                    placeholder="131-12345-6 (opcional)"
-                    className={`pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 ${
-                      rncValidationResult?.valid === true 
-                        ? "border-green-500 bg-green-50 dark:bg-green-950" 
-                        : rncValidationResult?.valid === false 
-                        ? "border-red-500 bg-red-50 dark:bg-red-950" 
-                        : ""
-                    }`}
-                    {...field}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      if (rncValidationResult) {
-                        setRncValidationResult(null);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const rncValue = e.target.value?.replace(/\D/g, '') || '';
-                      if (rncValue && rncValue.length >= 9) {
-                        handleRNCVerification(rncValue);
-                      }
-                    }}
-                  />
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={isVerifyingRNC || !field.value}
-                  onClick={() => {
-                    const rncValue = field.value?.replace(/\D/g, '') || '';
-                    if (rncValue) {
-                      handleRNCVerification(rncValue);
-                    }
-                  }}
-                  className="px-3"
-                >
-                  {isVerifyingRNC ? (
-                    <Search className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Verificar"
-                  )}
-                </Button>
-              </div>
-            </FormControl>
-            
-            {rncValidationResult && (
-              <div className={`mt-2 p-2 rounded-md text-sm ${
-                rncValidationResult.valid
-                  ? "bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800"
-                  : "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
-              }`}>
-                <div className="flex items-center gap-2">
-                  {rncValidationResult.valid ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <AlertCircle className="h-4 w-4" />
-                  )}
-                  <span>{rncValidationResult.message}</span>
-                </div>
-                {rncValidationResult.data && (
-                  <div className="mt-1 space-y-1">
-                    {rncValidationResult.data.name && (
-                      <div>Empresa: {rncValidationResult.data.name}</div>
-                    )}
-                    {rncValidationResult.data.categoria && (
-                      <Badge variant="secondary" className="text-xs">
-                        {rncValidationResult.data.categoria}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-            
-            <FormMessage className="text-red-500 dark:text-red-400" />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={registerForm.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-gray-700 dark:text-gray-200">Correo Electrónico</FormLabel>
-            <FormControl>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <Input
-                  type="email"
-                  placeholder="Ingresa tu email"
-                  className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                  {...field}
-                />
-              </div>
-            </FormControl>
-            <FormMessage className="text-red-500 dark:text-red-400" />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={registerForm.control}
-        name="password"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-gray-700 dark:text-gray-200">Contraseña</FormLabel>
-            <FormControl>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Ingresa tu contraseña"
-                  className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                  {...field}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </FormControl>
-            <FormMessage className="text-red-500 dark:text-red-400" />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={registerForm.control}
-        name="confirmPassword"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-gray-700 dark:text-gray-200">Confirmar Contraseña</FormLabel>
-            <FormControl>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirma tu contraseña"
-                  className="pl-10 pr-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                  {...field}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </FormControl>
-            <FormMessage className="text-red-500 dark:text-red-400" />
-          </FormItem>
-        )}
-      />
-      <Button
-        type="submit"
-        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-        disabled={registerMutation.isPending}
-      >
-        {registerMutation.isPending ? "Creando cuenta..." : "Crear Cuenta"}
-      </Button>
-    </form>
-  </Form>
-</TabsContent>
-
-{/* Forgot Password Tab */}
-<TabsContent value="forgot-password">
-  <Form {...forgotPasswordForm}>
-    <form onSubmit={forgotPasswordForm.handleSubmit((data) => forgotPasswordMutation.mutate(data))} className="space-y-4">
-      <div className="text-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recuperar Contraseña</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-          Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
-        </p>
-      </div>
-      
-      <FormField
-        control={forgotPasswordForm.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-gray-700 dark:text-gray-200">Correo Electrónico</FormLabel>
-            <FormControl>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <Input
-                  type="email"
-                  placeholder="Ingresa tu email"
-                  className="pl-10 bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                  {...field}
-                />
-              </div>
-            </FormControl>
-            <FormMessage className="text-red-500 dark:text-red-400" />
-          </FormItem>
-        )}
-      />
-      
-      <Button
-        type="submit"
-        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-        disabled={forgotPasswordMutation.isPending}
-      >
-        {forgotPasswordMutation.isPending ? "Enviando email..." : "Enviar Enlace de Recuperación"}
-      </Button>
-      
-      <div className="text-center mt-4">
-        <Button
-          type="button"
-          variant="link"
-          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
-          onClick={() => setActiveTab('login')}
-        >
-          ← Volver al login
-        </Button>
-      </div>
-    </form>
-  </Form>
-</TabsContent>
-                </Tabs>
-
-
-              </CardContent>
-            </Card>
-
-            {/* Footer */}
-            <div className="mt-8 text-center">
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  © 2025 Four One Solutions. Todos los derechos reservados.
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Sistema ERP para empresas dominicanas
-                </p>
               </div>
             </div>
-          </div>
 
-          {/* Right Column - Hero Section */}
-          <div className="hidden lg:flex items-center justify-center">
-            <div className="text-center space-y-6">
-              <div className="space-y-4">
-                <h1 className="text-4xl font-bold text-white">
-                  Solución ERP Integral para República Dominicana
-                </h1>
-                <p className="text-xl text-gray-300">
-                  Gestiona tu empresa con tecnología de vanguardia. Sistema completo de gestión empresarial con facturación DGII, punto de venta, inventario y más.
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
-                  <h3 className="font-semibold text-blue-400 mb-2">Gestión de Inventario</h3>
-                  <p className="text-gray-400">Control completo de productos, stock y almacenes en tiempo real</p>
+            {/* Right Column - Hero Section */}
+            <div className="hidden lg:flex items-center justify-center">
+              <div className="text-center space-y-6">
+                <div className="space-y-4">
+                  <h1 className="text-4xl font-bold text-white">
+                    Solución ERP Integral para República Dominicana
+                  </h1>
+                  <p className="text-xl text-gray-300">
+                    Gestiona tu empresa con tecnología de vanguardia. Sistema completo de gestión empresarial con facturación DGII, punto de venta, inventario y más.
+                  </p>
                 </div>
-                <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
-                  <h3 className="font-semibold text-blue-400 mb-2">Punto de Venta</h3>
-                  <p className="text-gray-400">Sistema POS moderno con impresión térmica y sincronización automática</p>
-                </div>
-                <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
-                  <h3 className="font-semibold text-blue-400 mb-2">Facturación DGII</h3>
-                  <p className="text-gray-400">Cumplimiento total con regulaciones dominicanas y NCF automáticos</p>
-                </div>
-                <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
-                  <h3 className="font-semibold text-blue-400 mb-2">Reportes Avanzados</h3>
-                  <p className="text-gray-400">Análisis detallados y reportes personalizables para tomar mejores decisiones</p>
+
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
+                    <h3 className="font-semibold text-blue-400 mb-2">Gestión de Inventario</h3>
+                    <p className="text-gray-400">Control completo de productos, stock y almacenes en tiempo real</p>
+                  </div>
+                  <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
+                    <h3 className="font-semibold text-blue-400 mb-2">Punto de Venta</h3>
+                    <p className="text-gray-400">Sistema POS moderno con impresión térmica y sincronización automática</p>
+                  </div>
+                  <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
+                    <h3 className="font-semibold text-blue-400 mb-2">Facturación DGII</h3>
+                    <p className="text-gray-400">Cumplimiento total con regulaciones dominicanas y NCF automáticos</p>
+                  </div>
+                  <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
+                    <h3 className="font-semibold text-blue-400 mb-2">Reportes Avanzados</h3>
+                    <p className="text-gray-400">Análisis detallados y reportes personalizables para tomar mejores decisiones</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
     </>
   );
 }
