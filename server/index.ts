@@ -80,7 +80,11 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    // Test database connection first
+    // Setup database for deployment (create tables if they don't exist)
+    const { setupDatabaseForDeploy } = await import("./deploy-db-setup");
+    await setupDatabaseForDeploy();
+    
+    // Test database connection
     const { testDatabaseConnection } = await import("./db");
     const dbConnected = await testDatabaseConnection();
     
