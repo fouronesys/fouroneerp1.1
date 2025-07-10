@@ -515,7 +515,7 @@ export default function NCFManagement() {
     }
   };
 
-  const filteredBatches = ncfBatches.filter(batch =>
+  const filteredBatches = (ncfBatches || []).filter(batch =>
     batch.tipo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     batch.descripcion?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -537,10 +537,10 @@ export default function NCFManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {ncfBatches.filter(b => b.estado === 'active').length}
+              {(ncfBatches || []).filter(b => b.estado === 'active').length}
             </div>
             <p className="text-xs text-muted-foreground">
-              De {ncfBatches.length} lotes totales
+              De {(ncfBatches || []).length} lotes totales
             </p>
           </CardContent>
         </Card>
@@ -551,7 +551,7 @@ export default function NCFManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {ncfBatches.reduce((sum, b) => sum + b.disponibles, 0).toLocaleString()}
+              {(ncfBatches || []).reduce((sum, b) => sum + b.disponibles, 0).toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
               En todos los lotes
@@ -565,7 +565,7 @@ export default function NCFManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {ncfBatches.reduce((sum, b) => sum + b.usados, 0).toLocaleString()}
+              {(ncfBatches || []).reduce((sum, b) => sum + b.usados, 0).toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
               Este período fiscal
