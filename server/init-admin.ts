@@ -29,6 +29,9 @@ export async function initializeAdminUser() {
       firstName: "Super",
       lastName: "Admin",
       role: "super_admin", // Always super_admin for system administrator
+      paymentConfirmed: true,
+      subscriptionPlan: "enterprise",
+      subscriptionExpiry: new Date('2125-07-10T00:00:00.000Z'),
       isActive: true,
       phoneNumber: "8293519324"
     };

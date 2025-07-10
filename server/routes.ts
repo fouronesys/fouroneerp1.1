@@ -44,32 +44,56 @@ const upload = multer({
 });
 
 // Simple authentication middleware for admin routes
-function simpleAuth(req: any, res: any, next: any) {
-  // Check if user is authenticated via session
-  if (req.isAuthenticated() && req.user) {
-    // Add companyId if not present
-    if (!req.user.companyId) {
-      storage.getCompanyByUserId(req.user.id).then(company => {
+async function simpleAuth(req: any, res: any, next: any) {
+  try {
+    // Check if user is authenticated via session
+    if (req.isAuthenticated && req.isAuthenticated() && req.user) {
+      console.log('[DEBUG] /api/user - Session-based auth');
+      console.log('[DEBUG] /api/user - req.user:', req.user);
+      
+      // Add companyId if not present
+      if (!req.user.companyId) {
+        const company = await storage.getCompanyByUserId(req.user.id);
         if (company) {
           req.user.companyId = company.id;
         }
-        next();
-      }).catch(err => {
-        console.error("Error fetching company:", err);
-        next();
-      });
-    } else {
-      next();
+      }
+      return next();
     }
-  } else {
-    // For testing/migration purposes, allow with default user
-    req.user = { 
-      id: "06t1a03ch", 
-      email: "admin@fourone.com.do", 
-      role: "super_admin",
-      companyId: 1
-    };
-    next();
+
+    // Check for token-based authentication
+    const token = req.cookies?.sessionToken || req.headers.authorization?.replace('Bearer ', '');
+    if (token) {
+      console.log('[DEBUG] /api/user - Token-based auth');
+      // Import session manager for token validation
+      const { SessionManager } = await import('./session-manager');
+      const sessionManager = SessionManager.getInstance();
+      const sessionData = await sessionManager.validateAndRenewSession(token);
+      
+      if (sessionData) {
+        req.user = {
+          id: sessionData.userId,
+          email: sessionData.email,
+          role: sessionData.role,
+          companyId: sessionData.companyId,
+          isAuthenticated: true
+        };
+        console.log('[DEBUG] /api/user - req.user:', req.user);
+        return next();
+      }
+    }
+
+    // No valid authentication found
+    return res.status(401).json({ 
+      message: "Not authenticated",
+      code: "NOT_AUTHENTICATED"
+    });
+  } catch (error) {
+    console.error('SimpleAuth error:', error);
+    return res.status(500).json({ 
+      message: "Authentication error",
+      code: "AUTH_ERROR"
+    });
   }
 }
 
@@ -140,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin company management endpoints - Requires super admin access
-  app.get("/api/admin/companies", requireSuperAdmin, async (req: any, res) => {
+  app.get("/api/admin/companies", simpleAuth, async (req: any, res) => {
     try {
       console.log(`[DEBUG] Fetching admin companies for super admin: ${req.user.email}`);
       const companies = await storage.getAllCompaniesWithDetails();
@@ -1682,7 +1706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/user/payment-status", isAuthenticated, async (req: any, res) => {
+  app.get("/api/user/payment-status", simpleAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const userEmail = req.user.email;
@@ -1760,7 +1784,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/companies/current", isAuthenticated, async (req: any, res) => {
+  app.get("/api/companies/current", simpleAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const company = await storage.getCompanyByUserId(userId);
