@@ -94,15 +94,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // New token-based authentication routes
   app.use('/api/auth', authRoutes);
 
-  // Legacy session heartbeat endpoint - deprecated in favor of token system
-  app.post("/api/auth/heartbeat", isAuthenticated, async (req: any, res) => {
+  // Token-based session heartbeat endpoint
+  app.post("/api/auth/heartbeat", sessionAuth, async (req: any, res) => {
     try {
       res.json({ 
         status: 'alive',
         userId: req.user.id,
         timestamp: new Date().toISOString(),
-        deprecated: true,
-        message: 'Use new token-based authentication system'
+        authenticated: true,
+        message: 'Session active'
       });
     } catch (error) {
       console.error("Heartbeat error:", error);
