@@ -339,8 +339,12 @@ export default function AuthPage() {
 
   const handleAnimationComplete = () => {
     setShowLoginAnimation(false);
-    // Reload the page to ensure clean state after login
-    window.location.reload();
+    // First redirect to homepage
+    setLocation("/");
+    // Then reload the page after a short delay to ensure the redirect happens first
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   };
 
   return (
