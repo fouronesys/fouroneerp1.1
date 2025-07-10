@@ -246,7 +246,7 @@ export default function DGIIReports() {
       </div>
 
       {/* Alert for pending reports */}
-      {summaries.some(s => s.registrosPendientes > 0) && (
+      {summaries && summaries.length > 0 && summaries.some(s => s.registrosPendientes > 0) && (
         <Alert className="mb-6 border-orange-500">
           <AlertTriangle className="h-4 w-4 text-orange-500" />
           <AlertTitle>Reportes Pendientes</AlertTitle>
@@ -259,7 +259,7 @@ export default function DGIIReports() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {['606', '607', 'T-REGISTRO'].map((tipo) => {
-          const summary = summaries.find(s => s.tipo === tipo);
+          const summary = summaries && summaries.length > 0 ? summaries.find(s => s.tipo === tipo) : null;
           return (
             <Card key={tipo}>
               <CardHeader className="pb-3">
@@ -428,7 +428,7 @@ export default function DGIIReports() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {reports.map((report) => (
+                    {reports && reports.length > 0 ? reports.map((report) => (
                       <TableRow key={report.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">
@@ -467,7 +467,13 @@ export default function DGIIReports() {
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                          No hay reportes generados
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               )}
