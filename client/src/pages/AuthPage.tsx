@@ -339,7 +339,7 @@ export default function AuthPage() {
 
   const handleAnimationComplete = () => {
     setShowLoginAnimation(false);
-    setLocation(ROUTES.DASHBOARD);
+    setLocation("/");
   };
 
   return (

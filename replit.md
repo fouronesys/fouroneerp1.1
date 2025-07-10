@@ -232,6 +232,11 @@ The system follows a monolithic architecture with clear separation of concerns:
   - **Implemented Brevo Email Integration**: Complete quote request system with professional email templates sent to info@fourone.com.do
   - **Enhanced RNC Validation**: Fixed RNC validation in quote requests to use same DGII lookup system as other ERP modules
   - **Email Service Configuration**: Added BREVO_API_KEY for transactional emails with comprehensive quote request processing
+- July 10, 2025. **Login Redirect Configuration Updated:**
+  - **Fixed Login Redirection**: Changed post-login redirect from "/dashboard" to "/" as requested by user
+  - **AuthPage.tsx Updated**: Modified handleAnimationComplete function to redirect to homepage instead of dashboard
+  - **User Experience Improved**: Login now correctly redirects to main landing page after successful authentication
+  - **Consistent Navigation**: Maintains user preference for homepage as main entry point after login
 - July 9, 2025. **SUCCESSFUL MIGRATION FROM REPLIT AGENT TO REPLIT ENVIRONMENT - PRODUCTION READY:**
   - **Complete System Migration**: Successfully migrated comprehensive Dominican Republic ERP system from Replit Agent to standard Replit environment
   - **Database Setup**: Created PostgreSQL database with 70+ tables, established proper schema deployment
