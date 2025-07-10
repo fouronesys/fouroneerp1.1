@@ -14,12 +14,10 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PWAInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [platform, setPlatform] = useState<string>('');
-
-  useEffect(() => {
+  // Temporarily disabled during migration to prevent runtime errors
+  return null;
+  
+  /* useEffect(() => {
     // Detect platform
     const userAgent = navigator.userAgent.toLowerCase();
     if (/iphone|ipad|ipod/.test(userAgent)) {
@@ -44,12 +42,12 @@ export function PWAInstallPrompt() {
       const installEvent = e as BeforeInstallPromptEvent;
       setDeferredPrompt(installEvent);
       
-      // Show prompt after 30 seconds or on user interaction
-      setTimeout(() => {
-        if (!isInstalled && !localStorage.getItem('pwa-install-dismissed')) {
-          setIsVisible(true);
-        }
-      }, 30000);
+      // Show prompt after 30 seconds or on user interaction - TEMPORARILY DISABLED
+      // setTimeout(() => {
+      //   if (!isInstalled && !localStorage.getItem('pwa-install-dismissed')) {
+      //     setIsVisible(true);
+      //   }
+      // }, 30000);
     };
 
     // Listen for successful installation
@@ -213,5 +211,5 @@ export function PWAInstallPrompt() {
         </CardContent>
       </Card>
     </div>
-  );
+  ); */
 }

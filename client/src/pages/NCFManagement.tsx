@@ -579,9 +579,9 @@ export default function NCFManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {ncfBatches.length > 0 
+              {(ncfBatches || []).length > 0 
                 ? (() => {
-                    const diasVencimiento = ncfBatches
+                    const diasVencimiento = (ncfBatches || [])
                       .filter(b => b.vencimiento && b.vencimiento !== '')
                       .map(b => {
                         const dias = Math.ceil((new Date(b.vencimiento).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
@@ -605,7 +605,7 @@ export default function NCFManagement() {
       </div>
 
       {/* Alerts */}
-      {ncfBatches.map(batch => getUsageAlert(batch))}
+      {(ncfBatches || []).map(batch => getUsageAlert(batch))}
 
       <Tabs defaultValue="batches" className="space-y-4">
         <TabsList>

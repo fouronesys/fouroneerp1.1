@@ -21,7 +21,7 @@ interface InstallOption {
 }
 
 export function InstallButton() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Temporarily disabled
   const [userPlatform, setUserPlatform] = useState<string>('unknown');
   const [canInstallPWA, setCanInstallPWA] = useState(false);
   const [pwaPrompt, setPwaPrompt] = useState<any>(null);
@@ -297,7 +297,10 @@ export function InstallButton() {
 
   const recommendedOption = installOptions.find(opt => opt.recommended);
 
-  return (
+  // Temporarily disabled to prevent runtime errors during migration
+  return null;
+  
+  /* return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="bg-blue-600 hover:bg-blue-700">
@@ -423,5 +426,5 @@ export function InstallButton() {
         </div>
       </DialogContent>
     </Dialog>
-  );
+  ); */
 }
