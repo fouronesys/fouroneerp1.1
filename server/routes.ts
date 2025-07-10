@@ -6647,7 +6647,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // RRHH - Employee Management Routes
-  app.get("/api/employees", isAuthenticated, async (req: any, res) => {
+  app.get("/api/employees", simpleAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const company = await storage.getCompanyByUserId(userId);
@@ -6664,7 +6664,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get company users for employee assignment
-  app.get("/api/company-users", isAuthenticated, async (req: any, res) => {
+  app.get("/api/company-users", simpleAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const company = await storage.getCompanyByUserId(userId);
@@ -6681,7 +6681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create user directly from employee form
-  app.post("/api/employees/create-user", isAuthenticated, async (req: any, res) => {
+  app.post("/api/employees/create-user", simpleAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const company = await storage.getCompanyByUserId(userId);
@@ -6716,7 +6716,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/employees/:id", isAuthenticated, async (req: any, res) => {
+  app.get("/api/employees/:id", simpleAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const company = await storage.getCompanyByUserId(userId);
@@ -6778,7 +6778,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/employees/:id", isAuthenticated, async (req: any, res) => {
+  app.put("/api/employees/:id", simpleAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const company = await storage.getCompanyByUserId(userId);
@@ -6803,7 +6803,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/employees/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/employees/:id", simpleAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const company = await storage.getCompanyByUserId(userId);

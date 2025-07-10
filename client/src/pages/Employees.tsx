@@ -149,12 +149,12 @@ export default function Employees() {
     },
   });
 
-  const filteredEmployees = (employees as Employee[]).filter((employee: Employee) =>
+  const filteredEmployees = employees && employees.length > 0 ? (employees as Employee[]).filter((employee: Employee) =>
     `${employee.firstName} ${employee.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (employee.department && employee.department.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  ) : [];
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -450,11 +450,13 @@ export default function Employees() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="">Sin asignar</SelectItem>
-                        {(companyUsers as any[]).map((user: any) => (
+                        {companyUsers && companyUsers.length > 0 ? (companyUsers as any[]).map((user: any) => (
                           <SelectItem key={user.id} value={user.id}>
                             {user.firstName} {user.lastName} ({user.email}) - {user.role}
                           </SelectItem>
-                        ))}
+                        )) : (
+                          <SelectItem value="">No hay usuarios disponibles</SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
